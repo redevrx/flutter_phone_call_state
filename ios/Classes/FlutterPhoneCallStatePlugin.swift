@@ -2,115 +2,61 @@ import Flutter
 import UIKit
 import CallKit
 
-public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin, CXCallObserverDelegate {
-    var callObserver: CXCallObserver!
-    var _channel: FlutterMethodChannel
+public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin, CXCallObserverDelegate, FlutterStreamHandler {
+    private var callObserver: CXCallObserver!
+    private var eventSink: FlutterEventSink?
 
-    var testTimer: Timer?
-    var counter = 0
-
+    // Registering the EventChannel and MethodChannel
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "flutter_phone_call_state", binaryMessenger: registrar.messenger())
-        let instance = FlutterPhoneCallStatePlugin(channel: channel) // Pass the channel here
-        registrar.addMethodCallDelegate(instance, channel: channel)
+        let instance = FlutterPhoneCallStatePlugin()
+
+        // Register the EventChannel and set the StreamHandler
+        let eventChannel = FlutterEventChannel(name: "flutter_phone_call_state", binaryMessenger: registrar.messenger())
+        eventChannel.setStreamHandler(instance)
     }
 
-    init(channel: FlutterMethodChannel) {
-        self._channel = channel
+    // Initializer to set up call observer
+    override init() {
         super.init()
         setupCallObserver()
     }
 
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch call.method {
-        case "getPlatformVersion":
-            result("iOS " + UIDevice.current.systemVersion)
-        default:
-            result(FlutterMethodNotImplemented)
-        }
+    // Stream handler: When a listener subscribes to the event stream
+    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = events
+        return nil
     }
 
+    // Stream handler: When a listener cancels the subscription
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        self.eventSink = nil
+        return nil
+    }
+
+    // Set up the call observer to listen for call state changes
     @available(iOS 10.0, *)
     func setupCallObserver() {
         callObserver = CXCallObserver()
         callObserver.setDelegate(self, queue: nil)
     }
 
+    // Handle call state changes and send updates via the EventChannel
     @available(iOS 10.0, *)
     public func callObserver(_ callObserver: CXCallObserver, callChanged call: CXCall) {
         if call.hasEnded {
-            print("CXCallState :Disconnected")
-            self._channel.invokeMethod("phone.disconnected", arguments: nil)
-        }
-        if call.isOutgoing && !call.hasConnected {
-            print("CXCallState :Dialing")
-            self._channel.invokeMethod("phone.dialing", arguments: nil)
-        }
-        if !call.isOutgoing && !call.hasConnected && !call.hasEnded {
-            print("CXCallState :Incoming")
-            self._channel.invokeMethod("phone.incoming", arguments: nil)
-        }
-        if call.hasConnected && !call.hasEnded {
-            print("CXCallState :Connected")
-            self._channel.invokeMethod("phone.connected", arguments: nil)
+            // Phone call ended
+            self.eventSink?(["status": 0, "phoneNumber": ""]) // 0 for call ended
+        } else if call.isOutgoing && !call.hasConnected {
+            // Outgoing call, dialing
+            self.eventSink?(["status": 1, "phoneNumber": ""]) // 1 for dialing
+        } else if !call.isOutgoing && !call.hasConnected && !call.hasEnded {
+            // Incoming call, waiting to connect
+            self.eventSink?(["status": 2, "phoneNumber": ""]) // 2 for incoming call
+        } else if call.hasConnected && !call.hasEnded {
+            // Call is connected
+            self.eventSink?(["status": 3, "phoneNumber": ""]) // 3 for connected call
+        } else {
+         self.eventSink?(["status": -1, "phoneNumber": ""])
         }
     }
 }
-
-//
-//public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin,CXCallObserverDelegate {
-//  var callObserver: CXCallObserver!
-//    var _channel: FlutterMethodChannel
-//
-//    var testTimer: Timer?
-//    var counter = 0
-//
-//  public static func register(with registrar: FlutterPluginRegistrar) {
-//    let channel = FlutterMethodChannel(name: "flutter_phone_call_state", binaryMessenger: registrar.messenger())
-//    let instance = FlutterPhoneCallStatePlugin()
-//    registrar.addMethodCallDelegate(instance, channel: channel)
-//
-//  }
-//
-//  init(channel:FlutterMethodChannel){
-//    super.init()
-//     _channel = channel
-//     setupCallObserver()
-// }
-//
-//  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-//    switch call.method {
-//    case "getPlatformVersion":
-//      result("iOS " + UIDevice.current.systemVersion)
-//    default:
-//      result(FlutterMethodNotImplemented)
-//    }
-//  }
-//
-//  @available(iOS 10.0,*)
-//  func setupCallObserver(){
-//              callObserver = CXCallObserver()
-//              callObserver.setDelegate(self, queue: nil)
-// }
-//
-//   @available(iOS 10.0,*)
-//   public func callObserver(_ callObserver: CXCallObserver, callChanged call: CXCall) {
-//        if call.hasEnded == true {
-//            print("CXCallState :Disconnected")
-//             _channel.invokeMethod("phone.disconnected", arguments: nil)
-//        }
-//        if call.isOutgoing == true && call.hasConnected == false {
-//            print("CXCallState :Dialing")
-//             _channel.invokeMethod("phone.dialing", arguments: nil)
-//        }
-//        if call.isOutgoing == false && call.hasConnected == false && call.hasEnded == false {
-//            print("CXCallState :Incoming")
-//             _channel.invokeMethod("phone.incoming", arguments: nil)
-//        }
-//
-//        if call.hasConnected == true && call.hasEnded == false {
-//            print("CXCallState : Connected")
-//              _channel.invokeMethod("phone.connected", arguments: nil)
-//        }
-//    }
-//}

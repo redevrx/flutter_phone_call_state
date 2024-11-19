@@ -1,7 +1,6 @@
-import 'dart:ui';
 
+import 'package:flutter_phone_call_state/src/model/call_result.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-
 import 'flutter_phone_call_state_method_channel.dart';
 
 abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
@@ -26,31 +25,8 @@ abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
     _instance = instance;
   }
 
-  Future<String?> getPlatformVersion() {
-    throw UnimplementedError('platformVersion() has not been implemented.');
-  }
 
-  void initCallState() {
-    throw UnimplementedError('init() has not been implemented.');
-  }
-
-  void setIncomingHandler(VoidCallback callback) {
-    throw UnimplementedError('has not been implemented.');
-  }
-
-  void setDialingHandler(VoidCallback callback) {
-    throw UnimplementedError('has not been implemented.');
-  }
-
-  void setConnectedHandler(VoidCallback callback) {
-    throw UnimplementedError('has not been implemented.');
-  }
-
-  void setDisconnectedHandler(VoidCallback callback) {
-    throw UnimplementedError('has not been implemented.');
-  }
-
-  void setErrorHandler(ErrorHandler handler) {
+  Stream<CallResult> phoneStateChange(){
     throw UnimplementedError('has not been implemented.');
   }
 }
