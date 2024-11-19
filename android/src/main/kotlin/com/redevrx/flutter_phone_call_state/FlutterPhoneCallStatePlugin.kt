@@ -1,7 +1,7 @@
-package com.example.flutter_phone_call_state
+package com.redevrx.flutter_phone_call_state
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import com.example.flutter_phone_call_state.handle.FlutterHandle
+import com.redevrx.flutter_phone_call_state.handle.FlutterHandle
 
 /** FlutterPhoneCallStatePlugin */
 class FlutterPhoneCallStatePlugin: FlutterPlugin {

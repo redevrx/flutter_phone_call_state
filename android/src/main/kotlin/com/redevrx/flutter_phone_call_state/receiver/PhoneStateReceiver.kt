@@ -1,4 +1,4 @@
-package com.example.flutter_phone_call_state.receiver
+package com.redevrx.flutter_phone_call_state.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context

@@ -1,4 +1,4 @@
-package com.example.flutter_phone_call_state.handle
+package com.redevrx.flutter_phone_call_state.handle
 
 import android.Manifest
 import android.content.Context
@@ -9,7 +9,7 @@ import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
-import com.example.flutter_phone_call_state.receiver.PhoneStateReceiver
+import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
 
 class FlutterHandle(binding: FlutterPlugin.FlutterPluginBinding) {
     private var phoneStateEventChannel: EventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")

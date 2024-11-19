@@ -1,4 +1,4 @@
-group = "com.example.flutter_phone_call_state"
+group = "com.redevrx.flutter_phone_call_state"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -26,7 +26,7 @@ apply plugin: "kotlin-android"
 
 android {
     if (project.android.hasProperty("namespace")) {
-        namespace = "com.example.flutter_phone_call_state"
+        namespace = "com.redevrx.flutter_phone_call_state"
     }
 
     compileSdk = 34

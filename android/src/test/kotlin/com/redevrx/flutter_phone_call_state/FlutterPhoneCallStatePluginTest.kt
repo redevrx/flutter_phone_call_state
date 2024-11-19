@@ -1,4 +1,4 @@
-package com.example.flutter_phone_call_state
+package com.redevrx.flutter_phone_call_state
 
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state.dart';
 
 void main() {
@@ -16,35 +14,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
-  final _flutterPhoneCallStatePlugin = FlutterPhoneCallState();
+  final _phoneCallStatePlugin = PhoneCallState.instance;
+  String status = 'none';
 
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    subscriptionPhoneCallStateChange();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
-    try {
-      platformVersion =
-         'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
+  void subscriptionPhoneCallStateChange() async {
+    _phoneCallStatePlugin.phoneStateChange.listen(
+      (event) {
+        debugPrint(
+            "Phone Number: ${event.number}\nPhone Status:${event.state.name}");
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+        scheduleMicrotask(() {
+          setState(() {
+            status = event.state.name;
+          });
+        });
+      },
+    );
   }
 
   @override
@@ -55,7 +46,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Text('Phone status: $status\n'),
         ),
       ),
     );

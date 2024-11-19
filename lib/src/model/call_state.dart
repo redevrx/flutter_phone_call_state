@@ -1,7 +1,1 @@
-enum CallState {
-  end,
-  outgoing,
-  incoming,
-  call,
-  none
-}
+enum CallState { end, outgoing, incoming, call, none }

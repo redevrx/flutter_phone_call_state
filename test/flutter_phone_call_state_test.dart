@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:flutter_phone_call_state/src/model/call_result.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state_platform_interface.dart';
@@ -12,24 +10,32 @@ class MockFlutterPhoneCallStatePlatform
     implements FlutterPhoneCallStatePlatform {
   @override
   Stream<CallResult> phoneStateChange() {
-    // TODO: implement phoneStateChange
-    throw UnimplementedError();
+    return Stream.value(
+        CallResult(state: CallState.call, number: "0857200286"));
   }
-
 }
 
 void main() {
-  final FlutterPhoneCallStatePlatform initialPlatform = FlutterPhoneCallStatePlatform.instance;
+  WidgetsFlutterBinding.ensureInitialized();
+  final FlutterPhoneCallStatePlatform initialPlatform =
+      FlutterPhoneCallStatePlatform.instance;
 
   test('$MethodChannelFlutterPhoneCallState is the default instance', () {
     expect(initialPlatform, isInstanceOf<MethodChannelFlutterPhoneCallState>());
   });
 
-  test('getPlatformVersion', () async {
-    FlutterPhoneCallState flutterPhoneCallStatePlugin = FlutterPhoneCallState();
-    MockFlutterPhoneCallStatePlatform fakePlatform = MockFlutterPhoneCallStatePlatform();
+  test('test phone state change', () async {
+    final flutterPhoneCallStatePlugin = PhoneCallState.instance;
+    MockFlutterPhoneCallStatePlatform fakePlatform =
+        MockFlutterPhoneCallStatePlatform();
     FlutterPhoneCallStatePlatform.instance = fakePlatform;
+    final result = CallResult(state: CallState.call, number: "0857200286");
 
-   // expect(await flutterPhoneCallStatePlugin.getPlatformVersion(), '42');
+    flutterPhoneCallStatePlugin.phoneStateChange.listen(
+      (event) {
+        expect(event.number, result.number);
+        expect(event.state, result.state);
+      },
+    );
   });
 }
