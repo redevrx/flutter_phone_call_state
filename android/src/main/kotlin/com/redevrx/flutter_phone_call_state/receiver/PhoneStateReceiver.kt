@@ -10,6 +10,9 @@ import android.telephony.PhoneStateListener
 open class PhoneStateReceiver : BroadcastReceiver() {
     var status: Int = -1
     var phoneNumber: String? = null
+    private var isDialing = false
+    private var isIncoming = false
+    private var lastDialNumber:String? = null
 
     fun instance(context: Context) {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -19,15 +22,45 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         try {
-            // ดึงเบอร์โทรที่กำลังโทรเข้ามา
             val incomingNumber = intent?.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+            val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
 
-            // ตรวจสอบสถานะการโทรจาก EXTRA_STATE
-            status = when (intent?.getStringExtra(TelephonyManager.EXTRA_STATE)) {
-                TelephonyManager.EXTRA_STATE_RINGING -> 2  // โทรเข้า
-                TelephonyManager.EXTRA_STATE_OFFHOOK -> 3
-                TelephonyManager.EXTRA_STATE_IDLE -> 0  // โทรเสร็จสิ้น
-                else -> -1  // ไม่มีการโทร
+            extraState.let {
+                when (it) {
+                    TelephonyManager.EXTRA_STATE_RINGING -> {
+                        status = 2
+                        phoneNumber = incomingNumber
+                        isIncoming = true
+                    }
+                    TelephonyManager.EXTRA_STATE_OFFHOOK ->  {
+                        if(isIncoming){
+                            status = 3
+                            isIncoming = false
+                        } else if(isDialing){
+                            if(incomingNumber != null && incomingNumber != lastDialNumber){
+                                status = 3
+                                isDialing = false
+                            }
+                        }else {
+                            status = 1
+                            isDialing = true
+                            lastDialNumber = incomingNumber
+                        }
+                    }
+                    TelephonyManager.EXTRA_STATE_IDLE -> {
+                        if(isDialing || isIncoming){
+                            status = 0
+                            phoneNumber = null
+                        }else {
+                            ///nothing
+                            status = -1
+                            phoneNumber = null
+                        }
+                    }
+                    else -> {
+                        status = -1
+                    }
+                }
             }
 
             phoneNumber = incomingNumber
@@ -38,26 +71,49 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
     private val mPhoneListener = object : PhoneStateListener() {
         override fun onCallStateChanged(state: Int, incomingNumber: String?) {
-            try {
-                when (state) {
-                    TelephonyManager.CALL_STATE_IDLE -> {
-                        status = 0  // โทรเสร็จสิ้น
+        checkCallStatus(state,incomingNumber)
+        }
+    }
+
+    private fun checkCallStatus(state:Int,incomingNumber:String?){
+        try {
+            when (state) {
+                TelephonyManager.CALL_STATE_IDLE -> {
+                    if(isDialing || isIncoming){
+                        status = 0
+                        phoneNumber = null
+                    }else {
+                        ///nothing
+                        status = -1
                         phoneNumber = null
                     }
-                    TelephonyManager.CALL_STATE_RINGING -> {
-                        status = 2  // โทรเข้า
-                        phoneNumber = incomingNumber
-                    }
-                    TelephonyManager.CALL_STATE_OFFHOOK -> {
+                }
+                TelephonyManager.CALL_STATE_RINGING -> {
+                    status = 2
+                    phoneNumber = incomingNumber
+                    isIncoming = true
+                }
+                TelephonyManager.CALL_STATE_OFFHOOK -> {
+                    if(isIncoming){
                         status = 3
-                    }
-                    else -> {
-                        status = -1  // สถานะอื่นๆ
+                        isIncoming = false
+                    } else if(isDialing){
+                       if(incomingNumber != null && incomingNumber != lastDialNumber){
+                           status = 3
+                           isDialing = false
+                       }
+                    }else {
+                        status = 1
+                        isDialing = true
+                        lastDialNumber = incomingNumber
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
+                else -> {
+                    status = -1
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

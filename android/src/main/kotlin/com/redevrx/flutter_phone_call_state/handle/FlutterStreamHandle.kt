@@ -11,7 +11,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
 
-class FlutterHandle(binding: FlutterPlugin.FlutterPluginBinding) {
+class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
     private var phoneStateEventChannel: EventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
 
     init {
@@ -22,12 +22,10 @@ class FlutterHandle(binding: FlutterPlugin.FlutterPluginBinding) {
                 receiver = object : PhoneStateReceiver() {
                     override fun onReceive(context: Context?, intent: Intent?) {
                         super.onReceive(context, intent)
-                        events?.success(
-                            mapOf(
-                                "status" to status,
-                                "phoneNumber" to phoneNumber
-                            )
-                        )
+                        safeSend(events, mapOf(
+                            "status" to status,
+                            "phoneNumber" to "${phoneNumber ?: ""}"
+                        ))
                     }
                 }
                 val context = binding.applicationContext
@@ -43,12 +41,10 @@ class FlutterHandle(binding: FlutterPlugin.FlutterPluginBinding) {
 
                 if (hasPhoneStatePermission && hasCallLogPermission) {
                     receiver.instance(context)
-                    events?.success(
-                        mapOf(
-                            "status" to receiver.status,
-                            "phoneNumber" to receiver.phoneNumber
-                        )
-                    )
+                    safeSend(events,mapOf(
+                        "status" to receiver.status,
+                        "phoneNumber" to "${receiver.phoneNumber ?: ""}",
+                    ))
                 }
 
                 binding.applicationContext.registerReceiver(
@@ -63,6 +59,15 @@ class FlutterHandle(binding: FlutterPlugin.FlutterPluginBinding) {
         })
     }
 
+    private fun safeSend(events: EventChannel.EventSink?,data:Map<String,Any>){
+        if(data["status"] == 0 || data["status"] == 1){
+            if("${data["phoneNumber"]}".length > 6) {
+                events?.success(data)
+            }
+        }else {
+            events?.success(data)
+        }
+    }
     fun dispose() {
         phoneStateEventChannel.setStreamHandler(null)
     }
