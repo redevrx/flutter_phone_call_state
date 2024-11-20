@@ -27,6 +27,21 @@ class _MyAppState extends State<MyApp> {
   void subscriptionPhoneCallStateChange() async {
     _phoneCallStatePlugin.phoneStateChange.listen(
       (event) {
+        switch(event.state){
+          case CallState.end:
+            // TODO: Handle this case.
+          case CallState.outgoing:
+            // TODO: Handle this case.
+          case CallState.outgoingAccept:
+            // TODO: Handle this case.
+          case CallState.incoming:
+            // TODO: Handle this case.
+          case CallState.call:
+            // TODO: Handle this case.
+          case CallState.none:
+            // TODO: Handle this case.
+        }
+
         debugPrint(
             "Phone Number: ${event.number} <------> Phone Status:${event.state.name}");
 

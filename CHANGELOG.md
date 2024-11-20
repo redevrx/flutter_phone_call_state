@@ -1,3 +1,7 @@
+## 0.0.4
+- Refactor Code
+- Add status outgoing Accept
+
 ## 0.0.3
 - Add example video
 

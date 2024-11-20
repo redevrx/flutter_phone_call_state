@@ -38,7 +38,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                             isIncoming = false
                         } else if(isDialing){
                             if(incomingNumber != null && incomingNumber != lastDialNumber){
-                                status = 3
+                                status = 4
                                 isDialing = false
                             }
                         }else {
@@ -99,7 +99,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                         isIncoming = false
                     } else if(isDialing){
                        if(incomingNumber != null && incomingNumber != lastDialNumber){
-                           status = 3
+                           status = 4
                            isDialing = false
                        }
                     }else {

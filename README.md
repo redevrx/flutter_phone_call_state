@@ -1,9 +1,34 @@
+# Flutter Phone Call State Plugin
+
+
+## Table of Contents
+- [Description](#description)
+- [Features](#features)
+- [Native Integration](#native-integration)
+- [Pay Attention](#pay-attention)
+- [How to Install](#how-to-install)
+    - [Flutter](#flutter)
+    - [Android Permissions](#android-permissions)
+- [How to Use](#how-to-use)
+    - [Get Stream Phone Call State](#get-stream-phone-call-state)
+    - [Available Call States](#available-call-states)
+- [Example App](#example-app)
+
+
 ## DESCRIPTION
+This Flutter plugin allows you to track and manage phone call states on Android and iOS devices. It helps you monitor the current state of a call (incoming, outgoing, accepted, or ended) and provides real-time updates.
 
-This plugin allows you to know quickly and easily if your Android or iOS device is receiving a call and to know the status of the call.
+## Features
+- Detects the current phone call status (incoming, answered, or ended).
+- Supports both Android and iOS platforms.
+- Provides real-time call state updates.
+- Simple and easy-to-use API.
 
+
+## Native Integration
 - Native Android: [TelephonyManager](https://developer.android.com/reference/android/telephony/TelephonyManager)
 - Native iOS: [CallKit](https://developer.apple.com/documentation/callkit)
+
 
 ## PAY ATTENTION
 
@@ -16,8 +41,10 @@ This plugin allows you to know quickly and easily if your Android or iOS device 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.3
+  flutter_phone_call_state: 0.0.4
 ```
+
+## android Permissions
 #### Android: Added permission on manifest
 ```xml
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -25,15 +52,59 @@ dependencies:
 ```
 > **Warning**: Adding `READ_CALL_LOG` permission, your app will be removed from the Play Store if you don't have a valid reason to use it. [Read more](https://support.google.com/googleplay/android-developer/answer/9047303?hl=en). But if you don't add it, you will not be able to know caller's number.
 
+
 ## HOW TO USE
 
 ### Get stream Phone Call State
 
 ```dart
-StreamBuilder(
-Stream:PhoneCallState.instance.phoneStateChange,
-)
+final _phoneCallStatePlugin = PhoneCallState.instance;
+void subscriptionPhoneCallStateChange() async {
+  _phoneCallStatePlugin.phoneStateChange.listen(
+        (event) {
+      switch(event.state){
+        case CallState.end:
+        // TODO: Handle this case.
+        case CallState.outgoing:
+        // TODO: Handle this case.
+        case CallState.outgoingAccept:
+        // TODO: Handle this case.
+        case CallState.incoming:
+        // TODO: Handle this case.
+        case CallState.call:
+        // TODO: Handle this case.
+        case CallState.none:
+        // TODO: Handle this case.
+      }
+
+      debugPrint(event.state.description);
+    },
+  );
+}
 ```
+
+### Available Call States:
+The `CallState` enum represents various states during a phone call. Each state describes a specific point during the lifecycle of a call. Below are the possible call states:
+
+- **`CallState.end`**:  
+  The call has ended. This occurs when the call is either disconnected by the caller or the recipient.
+
+- **`CallState.outgoing`**:  
+  The call is in the process of being dialed (outgoing call). This state is active right after the user initiates the call but before the recipient has answered.
+
+- **`CallState.outgoingAccept`**:  
+  The outgoing call has been accepted by the recipient. This state indicates that the recipient has answered the call and the conversation is now live.
+
+- **`CallState.incoming`**:  
+  An incoming call is being received. The device is receiving the call, but the user has not answered it yet. This state is active when the phone is ringing.
+
+- **`CallState.call`**:  
+  The incoming call has been accepted. This state is triggered once the incoming call is answered by the user, and the conversation is ongoing.
+
+- **`CallState.none`**:  
+  The call state is unknown or undefined. This state is used when the call state cannot be determined or is not applicable.
+
+These states help you track the progress of a phone call, allowing you to respond accordingly within your Flutter application.
 
 
 ```dart
