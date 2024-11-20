@@ -16,7 +16,7 @@ This plugin allows you to know quickly and easily if your Android or iOS device 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.1
+  flutter_phone_call_state: 0.0.2
 ```
 #### Android: Added permission on manifest
 ```xml
@@ -31,8 +31,8 @@ dependencies:
 
 ```dart
 StreamBuilder(
-Stream:PhoneCallState.instance.phoneStateChange
-....
+Stream:PhoneCallState.instance.phoneStateChange,
+)
 ```
 
 
@@ -79,3 +79,6 @@ class _MyAppState extends State<MyApp> {
   }
 }
 ```
+
+## Example App
+<img src="./assets/example.gif" width="350"  alt="Example Video App"/>
