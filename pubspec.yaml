@@ -1,6 +1,6 @@
 name: flutter_phone_call_state
 description: "This plugin allows you to know quickly and easily if your Android or iOS device is receiving a call and to know the status of the call."
-version: 0.0.2
+version: 0.0.3
 homepage: https://www.facebook.com/profile.php?id=100094077041664
 repository: https://github.com/redevrx/flutter_phone_call_state
 
