@@ -1,6 +1,3 @@
-# Flutter Phone Call State Plugin
-
-
 ## Table of Contents
 - [Description](#description)
 - [Features](#features)
@@ -13,6 +10,22 @@
     - [Get Stream Phone Call State](#get-stream-phone-call-state)
     - [Available Call States](#available-call-states)
 - [Example App](#example-app)
+
+
+<br>
+<p align="center">
+<img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/redevrx/flutter_phone_call_state">
+<img alt="GitHub contributors" src="https://img.shields.io/github/contributors/redevrx/flutter_phone_call_state">
+<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/redevrx/flutter_phone_call_state?style=social">
+<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/redevrx/flutter_phone_call_state/dart.yml?label=tests">
+<img alt="GitHub" src="https://img.shields.io/github/license/redevrx/flutter_phone_call_state">
+<img alt="Pub Points" src="https://img.shields.io/pub/points/flutter_phone_call_state">
+<img alt="Pub Popularity" src="https://img.shields.io/pub/popularity/flutter_phone_call_state">
+<img alt="Pub Likes" src="https://img.shields.io/pub/likes/flutter_phone_call_state">
+<img alt="Pub Version" src="https://img.shields.io/pub/v/flutter_phone_call_state">
+<img alt="Code Coverage" src="https://img.shields.io/codecov/c/github/redevrx/flutter_phone_call_state?logo=codecov&color">
+</p>
+</br>
 
 
 ## DESCRIPTION
