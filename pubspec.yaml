@@ -1,5 +1,5 @@
 name: flutter_phone_call_state
-description: "This Flutter plugin allows you to track and manage phone call states on Android and iOS devices. It helps you monitor the current state of a call (incoming, outgoing, accepted, or ended) and provides real-time updates."
+description: "This Flutter plugin allows you to track and manage phone call states on Android and iOS devices."
 version: 0.0.4
 homepage: https://www.facebook.com/profile.php?id=100094077041664
 repository: https://github.com/redevrx/flutter_phone_call_state
