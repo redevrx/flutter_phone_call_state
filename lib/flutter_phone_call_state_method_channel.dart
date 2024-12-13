@@ -16,9 +16,7 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   Stream<CallResult> phoneStateChange() {
     return _eventChannel
         .receiveBroadcastStream()
-        .map((event) {
-          return CallResult.fromFlag(event);
-        })
+        .map((event) => CallResult.fromFlag(event))
         .asBroadcastStream()
         .distinct();
   }
