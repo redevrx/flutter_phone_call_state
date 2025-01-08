@@ -15,7 +15,6 @@ class MockFlutterPhoneCallStatePlatform
   }
 }
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   final FlutterPhoneCallStatePlatform initialPlatform =
@@ -63,88 +62,106 @@ void main() {
     });
   });
 
-  group('test call result ', () {
-    test('should create CallResult from status and phone number', () {
-      final data = {
-        'status': 2,
-        'phoneNumber': '+1234567890',
-      };
+  group(
+    'test call result ',
+    () {
+      test('should create CallResult from status and phone number', () {
+        final data = {
+          'status': 2,
+          'phoneNumber': '+1234567890',
+        };
 
-      final result = CallResult.fromFlag(data);
+        final result = CallResult.fromFlag(data);
 
-      expect(result.state, CallState.incoming);
-      expect(result.number, '+1234567890');
-    });
+        expect(result.state, CallState.incoming);
+        expect(result.number, '+1234567890');
+      });
 
-    test('should return default CallState.none when invalid status is provided', () {
-      final data = {
-        'status': -1,
-        'phoneNumber': '+0987654321',
-      };
+      test(
+          'should return default CallState.none when invalid status is provided',
+          () {
+        final data = {
+          'status': -1,
+          'phoneNumber': '+0987654321',
+        };
 
-      final result = CallResult.fromFlag(data);
+        final result = CallResult.fromFlag(data);
 
-      expect(result.state, CallState.none);
-      expect(result.number, '+0987654321');
-    });
+        expect(result.state, CallState.none);
+        expect(result.number, '+0987654321');
+      });
 
-    test('should return empty string if no phone number is provided', () {
-      final data = {
-        'status': 3,
-      };
+      test('should return empty string if no phone number is provided', () {
+        final data = {
+          'status': 3,
+        };
 
-      final result = CallResult.fromFlag(data);
+        final result = CallResult.fromFlag(data);
 
-      expect(result.state, CallState.call);
-      expect(result.number, '');
-    });
+        expect(result.state, CallState.call);
+        expect(result.number, '');
+      });
 
-    test('test call state enum and Result State', () {
-      final result = CallResult(state: CallState.call,number: '01');
-      expect(result, isA<CallResult>());
-      expect(result.state, CallState.call);
-      expect(result.number.isNotEmpty, true);
-    },);
-
-    test('test call result from', () {
-      final result = CallResult.from(0);
-      expect(result, isA<CallState>());
-      expect(result, CallState.end);
-    },);
-
-    test('test call result from flag', () {
-      final result = CallResult.fromFlag({"status":0,'phoneNumber':'01'});
-      expect(result, isA<CallResult>());
-      expect(result.state, CallState.end);
-      expect(result.number.isNotEmpty, true);
-    },);
-  },);
-
-  group('test platform interface', () {
-    test('test phone state change', () async {
-      final flutterPhoneCallStatePlugin = PhoneCallState.instance;
-      MockFlutterPhoneCallStatePlatform fakePlatform =
-      MockFlutterPhoneCallStatePlatform();
-      FlutterPhoneCallStatePlatform.instance = fakePlatform;
-      final result = CallResult(state: CallState.call, number: "0857200286");
-
-      flutterPhoneCallStatePlugin.phoneStateChange.listen(
-            (event) {
-          expect(event.number, result.number);
-          expect(event.state, result.state);
+      test(
+        'test call state enum and Result State',
+        () {
+          final result = CallResult(state: CallState.call, number: '01');
+          expect(result, isA<CallResult>());
+          expect(result.state, CallState.call);
+          expect(result.number.isNotEmpty, true);
         },
       );
-    });
 
-    test('should allow setting a valid instance', () {
-      // Arrange: Create a mock instance of FlutterPhoneCallStatePlatform
-      final mockPlatform = MockFlutterPhoneCallStatePlatform();
+      test(
+        'test call result from',
+        () {
+          final result = CallResult.from(0);
+          expect(result, isA<CallState>());
+          expect(result, CallState.end);
+        },
+      );
 
-      // Act: Set the instance using the setter
-      FlutterPhoneCallStatePlatform.instance = mockPlatform;
+      test(
+        'test call result from flag',
+        () {
+          final result =
+              CallResult.fromFlag({"status": 0, 'phoneNumber': '01'});
+          expect(result, isA<CallResult>());
+          expect(result.state, CallState.end);
+          expect(result.number.isNotEmpty, true);
+        },
+      );
+    },
+  );
 
-      // Assert: Verify that the setter has correctly set the instance
-      expect(FlutterPhoneCallStatePlatform.instance, mockPlatform);
-    });
-  },);
+  group(
+    'test platform interface',
+    () {
+      test('test phone state change', () async {
+        final flutterPhoneCallStatePlugin = PhoneCallState.instance;
+        MockFlutterPhoneCallStatePlatform fakePlatform =
+            MockFlutterPhoneCallStatePlatform();
+        FlutterPhoneCallStatePlatform.instance = fakePlatform;
+        final result = CallResult(state: CallState.call, number: "0857200286");
+
+        flutterPhoneCallStatePlugin.phoneStateChange.listen(
+          (event) {
+            expect(event.number, result.number);
+            expect(event.state, result.state);
+          },
+        );
+      });
+
+      test('should allow setting a valid instance', () {
+        // Arrange: Create a mock instance of FlutterPhoneCallStatePlatform
+        final mockPlatform = MockFlutterPhoneCallStatePlatform();
+
+        // Act: Set the instance using the setter
+        FlutterPhoneCallStatePlatform.instance = mockPlatform;
+
+        // Assert: Verify that the setter has correctly set the instance
+        expect(FlutterPhoneCallStatePlatform.instance, mockPlatform);
+      });
+    },
+  );
 }

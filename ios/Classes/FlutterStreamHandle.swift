@@ -26,7 +26,7 @@ class FlutterStreamHandle : NSObject, FlutterStreamHandler,CXCallObserverDelegat
 
    @available(iOS 10.0, *)
      public func callObserver(_ callObserver: CXCallObserver, callChanged call: CXCall) {
-     let phoneNumber = call.handle?.value(forKey: "digits") as? String ?? ""
+     let phoneNumber = ""
 
           if call.hasEnded {
                     // Phone call ended
