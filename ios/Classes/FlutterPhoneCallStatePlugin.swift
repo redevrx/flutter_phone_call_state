@@ -9,6 +9,7 @@ public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin {
         let eventChannel = FlutterEventChannel(name: "flutter_phone_call_state", binaryMessenger: registrar.messenger())
         eventChannel.setStreamHandler(handler)
 
+        handler.beginBackgroundMonitoring()
      }
 }
 
