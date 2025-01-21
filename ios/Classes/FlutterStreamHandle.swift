@@ -12,6 +12,7 @@ class FlutterStreamHandle : NSObject, FlutterStreamHandler,CXCallObserverDelegat
     private var eventSink: FlutterEventSink?
     private var callObserver: CXCallObserver!
     private var isOutgoing = false
+    private var callback: (([String: Any]) -> Void)?
 
     override init() {
        super.init()
@@ -64,5 +65,12 @@ class FlutterStreamHandle : NSObject, FlutterStreamHandler,CXCallObserverDelegat
 
     public func send(data:[String: Any]){
     self.eventSink?(data)
+    if let callback = callback {
+                callback(data)
+            }
+    }
+
+    public func setCallback(callback: @escaping ([String: Any]) -> Void) {
+            self.callback = callback
     }
 }
