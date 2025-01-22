@@ -54,7 +54,7 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.4
+  flutter_phone_call_state: 0.0.5
 ```
 
 ## android Permissions
@@ -75,20 +75,24 @@ final _phoneCallStatePlugin = PhoneCallState.instance;
 void subscriptionPhoneCallStateChange() async {
   _phoneCallStatePlugin.phoneStateChange.listen(
         (event) {
-      switch(event.state){
-        case CallState.end:
-        // TODO: Handle this case.
-        case CallState.outgoing:
-        // TODO: Handle this case.
-        case CallState.outgoingAccept:
-        // TODO: Handle this case.
-        case CallState.incoming:
-        // TODO: Handle this case.
-        case CallState.call:
-        // TODO: Handle this case.
-        case CallState.none:
-        // TODO: Handle this case.
-      }
+          switch (event.state) {
+            case CallState.end:
+            // TODO: Handle this case.
+            case CallState.outgoing:
+            // TODO: Handle this case.
+            case CallState.outgoingAccept:
+            // TODO: Handle this case.
+            case CallState.incoming:
+            // TODO: Handle this case.
+            case CallState.call:
+            // TODO: Handle this case.
+            case CallState.none:
+            // TODO: Handle this case.
+            case CallState.hold:
+            // TODO: Handle this case.
+            case CallState.interruptAndHold:
+            // TODO: Handle this case.
+          }
 
       debugPrint(event.state.description);
     },
@@ -113,6 +117,12 @@ The `CallState` enum represents various states during a phone call. Each state d
 
 - **`CallState.call`**:  
   The incoming call has been accepted. This state is triggered once the incoming call is answered by the user, and the conversation is ongoing.
+
+- **`CallState.hold`**:  
+  User press button Hold.
+
+- **`CallState.interruptAndHold`**:  
+  Interrupt the call and hold the current call to answer the new one.
 
 - **`CallState.none`**:  
   The call state is unknown or undefined. This state is used when the call state cannot be determined or is not applicable.
