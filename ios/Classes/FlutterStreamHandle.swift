@@ -71,6 +71,12 @@ import CallKit
              send(data:["status": 2, "phoneNumber": phoneNumber]) // 2 for incoming call
           } else if call.hasConnected && !call.hasEnded {
                      // Call is connected
+              if let call = callObserver.calls.first(where: { $0 != call }) {
+                          // หากมีสายแทรกที่เข้ามา  Holding (หลังรับสายแทรก)
+                          send(data: ["status": 5, "phoneNumber": phoneNumber])
+                          return
+              }
+
               if(isOutgoing){
                send(data:["status": 4, "phoneNumber": phoneNumber]) // 4 for Outgoing connected call
                isOutgoing = false
@@ -80,10 +86,7 @@ import CallKit
           } else if call.isOnHold {
           ///click button Holding
              send(data:["status": 5, "phoneNumber": phoneNumber]) // Holding
-          } else if call.isIncoming && call.hasConnected && !call.hasEnded {
-          ///auto holing from callkit
-            send(data:["status": 5, "phoneNumber": phoneNumber]) // Holding
-          }else {
+          } else {
              send(data:["status": -1, "phoneNumber": phoneNumber])
           }
      }
