@@ -70,6 +70,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
     }
 
     private val mPhoneListener = object : PhoneStateListener() {
+        @Deprecated("Deprecated in Java")
         override fun onCallStateChanged(state: Int, incomingNumber: String?) {
         checkCallStatus(state,incomingNumber)
         }

@@ -77,7 +77,9 @@ import CallKit
               }else {
                send(data:["status": 3, "phoneNumber": phoneNumber]) // 3 for connected call
               }
-          } else {
+          } else if call.isOnHold {
+             send(data:["status": 5, "phoneNumber": phoneNumber]) // Holding
+          }else {
              send(data:["status": -1, "phoneNumber": phoneNumber])
           }
      }

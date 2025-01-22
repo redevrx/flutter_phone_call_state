@@ -15,6 +15,9 @@ enum CallState {
   /// The incoming call has been accepted.
   call,
 
+  /// holding.
+  hold,
+
   /// The call state is unknown or undefined.
   none,
 }
@@ -33,6 +36,8 @@ extension CallStateExtension on CallState {
         return 'Incoming call';
       case CallState.call:
         return 'Call accepted';
+      case CallState.hold:
+        return "Holding";
       case CallState.none:
         return 'Unknown call state';
     }
