@@ -13,6 +13,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
     private var isDialing = false
     private var isIncoming = false
     private var lastDialNumber:String? = null
+    private var isSecondCallIncoming = false // detect two call
 
     fun instance(context: Context) {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -28,31 +29,61 @@ open class PhoneStateReceiver : BroadcastReceiver() {
             extraState.let {
                 when (it) {
                     TelephonyManager.EXTRA_STATE_RINGING -> {
-                        status = 2
+//                        status = 2
+//                        phoneNumber = incomingNumber
+//                        isIncoming = true
+
+                        if (status == 3) {
+                            status = 5
+                        } else {
+                            status = 2
+                        }
                         phoneNumber = incomingNumber
                         isIncoming = true
                     }
                     TelephonyManager.EXTRA_STATE_OFFHOOK ->  {
-                        if(isIncoming){
+//                        if(isIncoming){
+//                            status = 3
+//                            isIncoming = false
+//                        } else if(isDialing){
+//                            if(incomingNumber != null && incomingNumber != lastDialNumber){
+//                                status = 4
+//                                isDialing = false
+//                            }
+//                        }else {
+//                            status = 1
+//                            isDialing = true
+//                            lastDialNumber = incomingNumber
+//                        }
+
+                        if (isIncoming) {
                             status = 3
                             isIncoming = false
-                        } else if(isDialing){
-                            if(incomingNumber != null && incomingNumber != lastDialNumber){
+                        } else if (isDialing) {
+                            if (incomingNumber != null && incomingNumber != lastDialNumber) {
                                 status = 4
                                 isDialing = false
                             }
-                        }else {
+                        } else {
                             status = 1
                             isDialing = true
                             lastDialNumber = incomingNumber
                         }
                     }
                     TelephonyManager.EXTRA_STATE_IDLE -> {
-                        if(isDialing || isIncoming){
+//                        if(isDialing || isIncoming){
+//                            status = 0
+//                            phoneNumber = null
+//                        }else {
+//                            ///nothing
+//                            status = -1
+//                            phoneNumber = null
+//                        }
+
+                        if (isDialing || isIncoming) {
                             status = 0
                             phoneNumber = null
-                        }else {
-                            ///nothing
+                        } else {
                             status = -1
                             phoneNumber = null
                         }
@@ -90,24 +121,50 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                     }
                 }
                 TelephonyManager.CALL_STATE_RINGING -> {
-                    status = 2
+//                    status = 2
+//                    phoneNumber = incomingNumber
+//                    isIncoming = true
+
+                    if (status == 3) {
+                        status = 5
+                    } else {
+                        status = 2
+                    }
                     phoneNumber = incomingNumber
                     isIncoming = true
                 }
                 TelephonyManager.CALL_STATE_OFFHOOK -> {
-                    if(isIncoming){
+//                    if(isIncoming){
+//                        status = 3
+//                        isIncoming = false
+//                    } else if(isDialing){
+//                       if(incomingNumber != null && incomingNumber != lastDialNumber){
+//                           status = 4
+//                           isDialing = false
+//                       }
+//                    }else {
+//                        status = 1
+//                        isDialing = true
+//                        lastDialNumber = incomingNumber
+//                    }
+
+                    if (isSecondCallIncoming) {
+                        status = 6
+                        isSecondCallIncoming = false
+                    } else if (isIncoming) {
                         status = 3
                         isIncoming = false
-                    } else if(isDialing){
-                       if(incomingNumber != null && incomingNumber != lastDialNumber){
-                           status = 4
-                           isDialing = false
-                       }
-                    }else {
+                    } else if (isDialing) {
+                        if (incomingNumber != null && incomingNumber != lastDialNumber) {
+                            status = 4
+                            isDialing = false
+                        }
+                    } else {
                         status = 1
                         isDialing = true
                         lastDialNumber = incomingNumber
                     }
+
                 }
                 else -> {
                     status = -1
