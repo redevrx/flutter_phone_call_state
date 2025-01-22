@@ -78,7 +78,11 @@ import CallKit
                send(data:["status": 3, "phoneNumber": phoneNumber]) // 3 for connected call
               }
           } else if call.isOnHold {
+          ///click button Holding
              send(data:["status": 5, "phoneNumber": phoneNumber]) // Holding
+          } else if call.isIncoming && call.hasConnected && !call.hasEnded {
+          ///auto holing from callkit
+            send(data:["status": 5, "phoneNumber": phoneNumber]) // Holding
           }else {
              send(data:["status": -1, "phoneNumber": phoneNumber])
           }
