@@ -43,7 +43,6 @@ class _MyAppState extends State<MyApp> {
           // TODO: Handle this case.
           case CallState.hold:
             // TODO: Handle this case.
-            throw UnimplementedError();
         }
 
         debugPrint(
