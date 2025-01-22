@@ -72,7 +72,7 @@ import CallKit
           } else if call.hasConnected && !call.hasEnded {
                      // Call is connected
               if let call = callObserver.calls.first(where: { $0 != call }) {
-                          // หากมีสายแทรกที่เข้ามา  Holding (หลังรับสายแทรก)
+                          // callkit auto holing
                           send(data: ["status": 5, "phoneNumber": phoneNumber])
                           return
               }
