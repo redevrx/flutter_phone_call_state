@@ -72,8 +72,8 @@ import CallKit
           } else if call.hasConnected && !call.hasEnded {
                      // Call is connected
               if let call = callObserver.calls.first(where: { $0 != call }) {
-                          // callkit auto holing
-                          send(data: ["status": 5, "phoneNumber": phoneNumber])
+                          // callkit auto holing return status accept interrupt call
+                          send(data: ["status": 6, "phoneNumber": phoneNumber])
                           return
               }
 

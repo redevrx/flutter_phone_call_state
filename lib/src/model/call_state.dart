@@ -18,6 +18,9 @@ enum CallState {
   /// holding.
   hold,
 
+  /// interrupt call and holding current call.
+  interruptAndHold,
+
   /// The call state is unknown or undefined.
   none,
 }
@@ -38,6 +41,8 @@ extension CallStateExtension on CallState {
         return 'Call accepted';
       case CallState.hold:
         return "Holding";
+      case CallState.interruptAndHold:
+        return "InterruptAndHold";
       case CallState.none:
         return 'Unknown call state';
     }

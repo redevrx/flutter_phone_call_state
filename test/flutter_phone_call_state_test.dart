@@ -44,7 +44,7 @@ void main() {
     });
 
     test('should have 6 states', () {
-      expect(CallState.values.length, 6);
+      expect(CallState.values.length, 8);
     });
 
     test('should return the correct index for each CallState', () {
@@ -53,7 +53,7 @@ void main() {
       expect(CallState.outgoingAccept.index, 2);
       expect(CallState.incoming.index, 3);
       expect(CallState.call.index, 4);
-      expect(CallState.none.index, 5);
+      expect(CallState.none.index, 7);
     });
 
     test('should check if CallState is "outgoing" correctly', () {

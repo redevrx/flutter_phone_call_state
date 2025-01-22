@@ -38,6 +38,8 @@ class CallResult {
         return CallState.outgoingAccept;
       case 5:
         return CallState.hold;
+      case 6:
+        return CallState.interruptAndHold;
       default:
         return CallState.none;
     }
