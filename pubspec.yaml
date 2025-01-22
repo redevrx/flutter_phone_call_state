@@ -6,6 +6,7 @@ repository: https://github.com/redevrx/flutter_phone_call_state
 
 environment:
   sdk: ^3.6.0
+  flutter: '>=3.3.0'
 
 dependencies:
   flutter:

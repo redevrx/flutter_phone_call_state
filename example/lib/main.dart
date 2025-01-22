@@ -42,9 +42,9 @@ class _MyAppState extends State<MyApp> {
           case CallState.none:
           // TODO: Handle this case.
           case CallState.hold:
-            // TODO: Handle this case.
+          // TODO: Handle this case.
           case CallState.interruptAndHold:
-            // TODO: Handle this case.
+          // TODO: Handle this case.
         }
 
         debugPrint(
