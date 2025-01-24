@@ -2,14 +2,20 @@ import Flutter
 import UIKit
 
 public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin {
+   var handler:FlutterStreamHandle?
+
    public static func register(with registrar: FlutterPluginRegistrar) {
         let instance = FlutterPhoneCallStatePlugin()
-        let handler = FlutterStreamHandle()
+         self.handler = FlutterStreamHandle()
 
         let eventChannel = FlutterEventChannel(name: "flutter_phone_call_state", binaryMessenger: registrar.messenger())
-        eventChannel.setStreamHandler(handler)
+        eventChannel.setStreamHandler(self.handler!)
 
-        handler.beginBackgroundMonitoring()
+        ///handler.beginBackgroundMonitoring()
+     }
+
+     public func initState(){
+     self.handler?.reSetup()
      }
 }
 

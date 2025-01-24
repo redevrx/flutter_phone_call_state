@@ -73,9 +73,13 @@ import CallKit
                            sleep(2)
                            print("request start background task")
                            self.beginBackgroundTask()
-                       }
+               }
            }
        }
+
+   public func reSetup(){
+     setupCallObserver()
+   }
 
    @available(iOS 10.0, *)
    private func setupCallObserver() {
