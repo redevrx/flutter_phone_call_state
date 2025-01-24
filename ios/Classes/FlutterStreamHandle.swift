@@ -32,6 +32,7 @@ import CallKit
    private func beginBackgroundTask() {
            self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
                self.endBackgroundTask()
+               self.beginBackgroundTask()
            })
 
            if backgroundTaskIdentifier == .invalid {
