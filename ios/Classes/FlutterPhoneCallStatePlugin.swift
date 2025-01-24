@@ -35,6 +35,10 @@ public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin {
            self.handler?.reSetup()
    }
 
+   public func handle() -> FlutterStreamHandle? {
+   return self.handler
+   }
+
 }
 
 // public class FlutterPhoneCallStatePlugin: NSObject, FlutterPlugin, CXCallObserverDelegate, FlutterStreamHandler {
