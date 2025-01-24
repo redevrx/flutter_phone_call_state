@@ -37,13 +37,15 @@ import BackgroundTasks
                return
            }
 
-           self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+        self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+               print("Background task is about to expire!")
                self.endBackgroundTask()
-           })
+        })
 
-           if  self.backgroundTaskIdentifier ==  .invalid {
+        if  self.backgroundTaskIdentifier ==  .invalid {
                print("Failed to start background task")
-           } else {
+               return
+        } else {
                print("Background task started")
                DispatchQueue.global().async {
 
@@ -68,8 +70,8 @@ import BackgroundTasks
 
 
            if self.backgroundTaskIdentifier != .invalid {
-               UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
-               backgroundTaskIdentifier = .invalid
+               UIApplication.shared.endBackgroundTask(self.backgroundTaskIdentifier)
+               self.backgroundTaskIdentifier = .invalid
                isTaskRunning = false
                print("Background task ended")
 
