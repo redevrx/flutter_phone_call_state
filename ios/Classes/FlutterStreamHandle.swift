@@ -38,9 +38,9 @@ import CallKit
            }
 
            isTaskRunning = true
-           processingTask = GBProcessingTask()
+           self.processingTask = GBProcessingTask()
 
-           processingTask?.startTask { [weak self] in
+           self.processingTask?.startTask { [weak self] in
               self?.endBackgroundTask()
            }
 
@@ -48,7 +48,7 @@ import CallKit
 //                self.endBackgroundTask()
 //            })
 
-           if backgroundTaskIdentifier ==  nil {//.invalid {
+           if self.processingTask ==  nil {//.invalid {
                print("Failed to start background task")
            } else {
                print("Background task started")
@@ -73,7 +73,7 @@ import CallKit
                    return
                }
 
-           if let task = processingTask {
+           if let task = self.processingTask {
                       task.endTask()
                       processingTask = nil
                       isTaskRunning = false
