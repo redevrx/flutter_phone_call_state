@@ -48,10 +48,8 @@ import CallKit
                print("Background task started")
                DispatchQueue.global().async {
 
-                for _ in 1...2 {
-                  sleep(60)
-                  print("1 minute passed")
-                }
+                sleep(60)
+                print("1 minute passed")
 
                 print("Background work completed")
                 self.endBackgroundTask()
