@@ -13,7 +13,8 @@ import CallKit
     private var callObserver: CXCallObserver!
     private var isOutgoing = false
     private var callback: (([String: Any]) -> Void)?
-    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+//     private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+    private var processingTask: GBProcessingTask?
     private var isTaskRunning = false
 
     override init() {
@@ -37,12 +38,17 @@ import CallKit
            }
 
            isTaskRunning = true
+           processingTask = GBProcessingTask()
 
-           self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-               self.endBackgroundTask()
-           })
+           processingTask?.startTask { [weak self] in
+              self?.endBackgroundTask()
+           }
 
-           if backgroundTaskIdentifier == .invalid {
+//            self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+//                self.endBackgroundTask()
+//            })
+
+           if backgroundTaskIdentifier ==  nil {//.invalid {
                print("Failed to start background task")
            } else {
                print("Background task started")
@@ -67,18 +73,32 @@ import CallKit
                    return
                }
 
-           if backgroundTaskIdentifier != .invalid {
-               UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
-               backgroundTaskIdentifier = .invalid
-               isTaskRunning = false
-               print("Background task ended")
+           if let task = processingTask {
+                      task.endTask()
+                      processingTask = nil
+                      isTaskRunning = false
+                      print("Background task ended")
 
-               DispatchQueue.global().async {
-                           sleep(2)
-                           print("request start background task")
-                           self.beginBackgroundTask()
-                       }
+                      // Optionally, request a new background task after some time
+                      DispatchQueue.global().async {
+                          sleep(2)
+                          print("Requesting to start a new background task")
+                          self.beginBackgroundTask()
+                      }
            }
+
+//            if backgroundTaskIdentifier != .invalid {
+//                UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+//                backgroundTaskIdentifier = .invalid
+//                isTaskRunning = false
+//                print("Background task ended")
+//
+//                DispatchQueue.global().async {
+//                            sleep(2)
+//                            print("request start background task")
+//                            self.beginBackgroundTask()
+//                        }
+//            }
        }
 
    @available(iOS 10.0, *)
