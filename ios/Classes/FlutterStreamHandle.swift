@@ -7,7 +7,6 @@
 import Flutter
 import UIKit
 import CallKit
-import BackgroundTasks
 
 @objc class FlutterStreamHandle : NSObject, FlutterStreamHandler,CXCallObserverDelegate {
     private var eventSink: FlutterEventSink?
@@ -49,15 +48,13 @@ import BackgroundTasks
                print("Background task started")
                DispatchQueue.global().async {
 
-                 let workDuration: TimeInterval = 30 * 60
-                             let numberOfIntervals = Int(workDuration / 60)
+                for _ in 1...2 {
+                  sleep(60)
+                  print("1 minute passed")
+                }
 
-                             for _ in 1...numberOfIntervals {
-                                 sleep(60)
-                                 print("1 minute passed")
-                             }
-                             print("Background work completed")
-                             self.endBackgroundTask()
+                print("Background work completed")
+                self.endBackgroundTask()
                }
            }
        }
