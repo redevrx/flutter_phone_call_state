@@ -14,6 +14,7 @@ import CallKit
     private var isOutgoing = false
     private var callback: (([String: Any]) -> Void)?
     private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+    private var isTaskRunning = false
 
     override init() {
        super.init()
@@ -30,6 +31,13 @@ import CallKit
         }
 
    private func beginBackgroundTask() {
+        guard !isTaskRunning else {
+               print("Background task is already running. Skipping new task start.")
+               return
+           }
+
+           isTaskRunning = true
+
            self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
                self.endBackgroundTask()
            })
@@ -54,9 +62,15 @@ import CallKit
        }
 
        private func endBackgroundTask() {
+          guard isTaskRunning else {
+                   print("Background task is already ended. Skipping end.")
+                   return
+               }
+
            if backgroundTaskIdentifier != .invalid {
                UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
                backgroundTaskIdentifier = .invalid
+               isTaskRunning = false
                print("Background task ended")
 
                DispatchQueue.global().async {
