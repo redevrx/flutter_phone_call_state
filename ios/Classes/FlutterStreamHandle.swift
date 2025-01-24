@@ -31,44 +31,16 @@ import CallKit
         }
 
    private func beginBackgroundTask() {
-        guard !isTaskRunning else {
-               print("Background task is already running. Skipping new task start.")
-               return
-           }
-
         self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
                print("Background task is about to expire!")
                self.endBackgroundTask()
         })
-
-        if  self.backgroundTaskIdentifier ==  .invalid {
-               print("Failed to start background task")
-               return
-        } else {
-               print("Background task started")
-               DispatchQueue.global().async {
-
-                sleep(60)
-                print("1 minute passed")
-
-                print("Background work completed")
-                self.endBackgroundTask()
-               }
-           }
-       }
+   }
 
         func endBackgroundTask() {
-          guard isTaskRunning else {
-                   print("Background task is already ended. Skipping end.")
-                   return
-               }
-
-           if self.backgroundTaskIdentifier != .invalid {
                UIApplication.shared.endBackgroundTask(self.backgroundTaskIdentifier)
                self.backgroundTaskIdentifier = .invalid
-               isTaskRunning = false
                print("Background task ended")
-           }
        }
 
    public func reSetup(){
