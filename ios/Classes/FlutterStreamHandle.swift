@@ -7,14 +7,14 @@
 import Flutter
 import UIKit
 import CallKit
+import BackgroundTasks
 
 @objc class FlutterStreamHandle : NSObject, FlutterStreamHandler,CXCallObserverDelegate {
     private var eventSink: FlutterEventSink?
     private var callObserver: CXCallObserver!
     private var isOutgoing = false
     private var callback: (([String: Any]) -> Void)?
-//     private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
-    private var processingTask: GBProcessingTask?
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
     private var isTaskRunning = false
 
     override init() {
@@ -37,18 +37,11 @@ import CallKit
                return
            }
 
-           isTaskRunning = true
-           self.processingTask = GBProcessingTask()
+           self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+               self.endBackgroundTask()
+           })
 
-           self.processingTask?.startTask { [weak self] in
-              self?.endBackgroundTask()
-           }
-
-//            self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
-//                self.endBackgroundTask()
-//            })
-
-           if self.processingTask ==  nil {//.invalid {
+           if  self.backgroundTaskIdentifier ==  .invalid {
                print("Failed to start background task")
            } else {
                print("Background task started")
@@ -73,32 +66,19 @@ import CallKit
                    return
                }
 
-           if let task = self.processingTask {
-                      task.endTask()
-                      processingTask = nil
-                      isTaskRunning = false
-                      print("Background task ended")
 
-                      // Optionally, request a new background task after some time
-                      DispatchQueue.global().async {
-                          sleep(2)
-                          print("Requesting to start a new background task")
-                          self.beginBackgroundTask()
-                      }
+           if self.backgroundTaskIdentifier != .invalid {
+               UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+               backgroundTaskIdentifier = .invalid
+               isTaskRunning = false
+               print("Background task ended")
+
+               DispatchQueue.global().async {
+                           sleep(2)
+                           print("request start background task")
+                           self.beginBackgroundTask()
+                       }
            }
-
-//            if backgroundTaskIdentifier != .invalid {
-//                UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
-//                backgroundTaskIdentifier = .invalid
-//                isTaskRunning = false
-//                print("Background task ended")
-//
-//                DispatchQueue.global().async {
-//                            sleep(2)
-//                            print("request start background task")
-//                            self.beginBackgroundTask()
-//                        }
-//            }
        }
 
    @available(iOS 10.0, *)
