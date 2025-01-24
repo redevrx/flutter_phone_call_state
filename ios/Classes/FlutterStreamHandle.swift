@@ -32,9 +32,6 @@ import CallKit
    private func beginBackgroundTask() {
            self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
                self.endBackgroundTask()
-
-                print("request start background task")
-               self.beginBackgroundTask()
            })
 
            if backgroundTaskIdentifier == .invalid {
@@ -49,6 +46,12 @@ import CallKit
                UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
                backgroundTaskIdentifier = .invalid
                print("Background task ended")
+
+               DispatchQueue.global().async {
+                           sleep(2)
+                           print("request start background task")
+                           self.beginBackgroundTask()
+                       }
            }
        }
 
