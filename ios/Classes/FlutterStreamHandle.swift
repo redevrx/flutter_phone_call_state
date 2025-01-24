@@ -38,6 +38,18 @@ import CallKit
                print("Failed to start background task")
            } else {
                print("Background task started")
+               DispatchQueue.global().async {
+
+                 let workDuration: TimeInterval = 30 * 60
+                             let numberOfIntervals = Int(workDuration / 60)
+
+                             for _ in 1...numberOfIntervals {
+                                 sleep(60)
+                                 print("1 minute passed")
+                             }
+                             print("Background work completed")
+                             self.endBackgroundTask()
+               }
            }
        }
 
