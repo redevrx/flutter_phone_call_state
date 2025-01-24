@@ -52,12 +52,12 @@ import CallKit
                 print("1 minute passed")
 
                 print("Background work completed")
-                self.endBackgroundTask()
+                endBackgroundTask()
                }
            }
        }
 
-       private func endBackgroundTask() {
+        func endBackgroundTask() {
           guard isTaskRunning else {
                    print("Background task is already ended. Skipping end.")
                    return
@@ -68,12 +68,6 @@ import CallKit
                self.backgroundTaskIdentifier = .invalid
                isTaskRunning = false
                print("Background task ended")
-
-               DispatchQueue.global().async {
-                           sleep(2)
-                           print("request start background task")
-                           self.beginBackgroundTask()
-               }
            }
        }
 
