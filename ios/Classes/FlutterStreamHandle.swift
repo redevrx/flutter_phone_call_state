@@ -52,7 +52,7 @@ import CallKit
                 print("1 minute passed")
 
                 print("Background work completed")
-                endBackgroundTask()
+                self.endBackgroundTask()
                }
            }
        }
