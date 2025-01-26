@@ -1,4 +1,7 @@
 ## 0.0.5
+ - Fix Bug ios
+
+## 0.0.5
 - Refactor Code
 - Add Hold
 - Add Interrupt Call

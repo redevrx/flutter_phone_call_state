@@ -6,6 +6,8 @@
 - [How to Install](#how-to-install)
     - [Flutter](#flutter)
     - [Android Permissions](#android-permissions)
+    - [Ios Permissions](#ios-permissions)
+    - [Ios Background Handle](#ios-background-monitor-handler)
 - [How to Use](#how-to-use)
     - [Get Stream Phone Call State](#get-stream-phone-call-state)
     - [Available Call States](#available-call-states)
@@ -54,10 +56,10 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.5
+  flutter_phone_call_state: 0.0.6
 ```
 
-## android Permissions
+## Android Permissions
 #### Android: Added permission on manifest
 ```xml
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -65,6 +67,56 @@ dependencies:
 ```
 > **Warning**: Adding `READ_CALL_LOG` permission, your app will be removed from the Play Store if you don't have a valid reason to use it. [Read more](https://support.google.com/googleplay/android-developer/answer/9047303?hl=en). But if you don't add it, you will not be able to know caller's number.
 
+## Ios Permissions
+#### Ios: Added permission on list.info
+```xml
+<key>UIBackgroundModes</key>
+<array>
+<!--add more permission-->
+</array>
+```
+
+## Ios Background Monitor Handler
+
+```
+import flutter_phone_call_state
+import ...
+
+@main
+@objc class AppDelegate: FlutterAppDelegate {
+    private var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+    
+  override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  )....
+    
+    func initBackground(){
+        var backgroundTaskIdentifier:UIBackgroundTaskIdentifier = .invalid
+        
+        backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
+                UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
+        })
+    }
+    
+    override func applicationWillEnterForeground(_ application: UIApplication) {
+        super.applicationWillEnterForeground(application)
+        FlutterPhoneCallStatePlugin.shared.initState()
+    }
+    
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+        super.applicationDidEnterBackground(application)
+        
+        ///using beginBackgroundMonitoring
+        FlutterPhoneCallStatePlugin.shared.beginBackgroundMonitoring()
+        
+        //or using custom
+        initBackground()
+    }
+}
+```
+
+> **Warning** The background task should be called before the app enters background mode or app mini mode, or at the moment when the call is initiated. If called directly in applicationDidEnterBackground, the plugin might not work properly.
 
 ## HOW TO USE
 
