@@ -28,6 +28,7 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
                         ))
                     }
                 }
+
                 val context = binding.applicationContext
                 val hasPhoneStatePermission = ContextCompat.checkSelfPermission(
                     context,
@@ -41,9 +42,10 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
 
                 if (hasPhoneStatePermission && hasCallLogPermission) {
                     receiver.instance(context)
-                    safeSend(events,mapOf(
+                    // ส่งสถานะเริ่มต้นไปยัง Flutter
+                    safeSend(events, mapOf(
                         "status" to receiver.status,
-                        "phoneNumber" to "${receiver.phoneNumber ?: ""}",
+                        "phoneNumber" to "${receiver.phoneNumber ?: ""}"
                     ))
                 }
 
@@ -68,6 +70,7 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
             events?.success(data)
         }
     }
+
     fun dispose() {
         phoneStateEventChannel.setStreamHandler(null)
     }
