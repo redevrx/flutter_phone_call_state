@@ -27,8 +27,8 @@ open class PhoneStateReceiver : BroadcastReceiver() {
             val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
 
             extraState.let {
+                println("raw status: $it")
                 when (it) {
-                    println("raw status: $it")
                     TelephonyManager.EXTRA_STATE_RINGING -> {
                         status = 2
                         phoneNumber = incomingNumber
