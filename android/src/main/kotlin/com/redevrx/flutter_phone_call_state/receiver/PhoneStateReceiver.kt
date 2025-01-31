@@ -28,18 +28,11 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
             extraState.let {
                 when (it) {
+                    println("raw status: $it")
                     TelephonyManager.EXTRA_STATE_RINGING -> {
                         status = 2
                         phoneNumber = incomingNumber
                         isIncoming = true
-
-//                        if (status == 3) {
-//                            status = 5
-//                        } else {
-//                            status = 2
-//                        }
-//                        phoneNumber = incomingNumber
-//                        isIncoming = true
                     }
                     TelephonyManager.EXTRA_STATE_OFFHOOK ->  {
                         if(isIncoming){
@@ -55,20 +48,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                             isDialing = true
                             lastDialNumber = incomingNumber
                         }
-
-//                        if (isIncoming) {
-//                            status = 3
-//                            isIncoming = false
-//                        } else if (isDialing) {
-//                            if (incomingNumber != null && incomingNumber != lastDialNumber) {
-//                                status = 4
-//                                isDialing = false
-//                            }
-//                        } else {
-//                            status = 1
-//                            isDialing = true
-//                            lastDialNumber = incomingNumber
-//                        }
                     }
                     TelephonyManager.EXTRA_STATE_IDLE -> {
                         if(isDialing || isIncoming){
@@ -79,14 +58,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                             status = -1
                             phoneNumber = null
                         }
-
-//                        if (isDialing || isIncoming) {
-//                            status = 0
-//                            phoneNumber = null
-//                        } else {
-//                            status = -1
-//                            phoneNumber = null
-//                        }
                     }
                     else -> {
                         status = -1
@@ -109,6 +80,8 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
     private fun checkCallStatus(state:Int,incomingNumber:String?){
         try {
+            println("raw status: $state")
+
             when (state) {
                 TelephonyManager.CALL_STATE_IDLE -> {
                     if(isDialing || isIncoming){
@@ -124,14 +97,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                     status = 2
                     phoneNumber = incomingNumber
                     isIncoming = true
-
-//                    if (status == 3) {
-//                        status = 5
-//                    } else {
-//                        status = 2
-//                    }
-//                    phoneNumber = incomingNumber
-//                    isIncoming = true
                 }
                 TelephonyManager.CALL_STATE_OFFHOOK -> {
                     if(isIncoming){
@@ -147,24 +112,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                         isDialing = true
                         lastDialNumber = incomingNumber
                     }
-
-//                    if (isSecondCallIncoming) {
-//                        status = 6
-//                        isSecondCallIncoming = false
-//                    } else if (isIncoming) {
-//                        status = 3
-//                        isIncoming = false
-//                    } else if (isDialing) {
-//                        if (incomingNumber != null && incomingNumber != lastDialNumber) {
-//                            status = 4
-//                            isDialing = false
-//                        }
-//                    } else {
-//                        status = 1
-//                        isDialing = true
-//                        lastDialNumber = incomingNumber
-//                    }
-
                 }
                 else -> {
                     status = -1
