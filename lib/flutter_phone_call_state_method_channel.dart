@@ -7,7 +7,7 @@ import 'flutter_phone_call_state_platform_interface.dart';
 class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   /// The method channel used to interact with the native platform.
   final _eventChannel = const EventChannel('flutter_phone_call_state');
-  final _methodChannel = const MethodChannel('flutter_phone_call_state');
+  final _methodChannel = const MethodChannel('flutter_phone_call_state_channel');
 
   @override
   void onStateChange({required void Function(CallResult result) callback}) {
