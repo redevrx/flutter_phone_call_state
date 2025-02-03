@@ -5,10 +5,10 @@ import com.redevrx.flutter_phone_call_state.handle.FlutterStreamHandle
 
 /** FlutterPhoneCallStatePlugin */
 class FlutterPhoneCallStatePlugin: FlutterPlugin {
-  private lateinit var flutterHandler: FlutterStreamHandle
+  private val flutterHandler =  FlutterStreamHandle
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    flutterHandler = FlutterStreamHandle(flutterPluginBinding)
+    flutterHandler.init(flutterPluginBinding)
   }
 
 

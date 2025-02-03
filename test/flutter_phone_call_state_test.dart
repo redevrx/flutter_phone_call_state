@@ -13,6 +13,10 @@ class MockFlutterPhoneCallStatePlatform
     return Stream.value(
         CallResult(state: CallState.call, number: "0857200286"));
   }
+
+  @override
+  void onStateChange({required void Function(CallResult result) callback}) {
+  }
 }
 
 void main() {

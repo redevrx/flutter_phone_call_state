@@ -10,11 +10,18 @@ import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
+import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 
-class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
-    private var phoneStateEventChannel: EventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
+object FlutterStreamHandle {
+    private lateinit var phoneStateEventChannel: EventChannel
+    private lateinit var methodChannel: MethodChannel
 
-    init {
+    fun init(binding: FlutterPlugin.FlutterPluginBinding){
+        phoneStateEventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
+        methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state")
+
         phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             private lateinit var receiver: PhoneStateReceiver
 
@@ -22,10 +29,15 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
                 receiver = object : PhoneStateReceiver() {
                     override fun onReceive(context: Context?, intent: Intent?) {
                         super.onReceive(context, intent)
-                        safeSend(events, mapOf(
-                            "status" to status,
-                            "phoneNumber" to "${phoneNumber ?: ""}"
-                        ))
+
+                        runBlocking {
+                            delay(750)
+
+                            safeSend(events, mapOf(
+                                "status" to status,
+                                "phoneNumber" to (phoneNumber ?: "")
+                            ))
+                        }
                     }
                 }
 
@@ -41,18 +53,14 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (hasPhoneStatePermission && hasCallLogPermission) {
-                    receiver.instance(context)
-                    // ส่งสถานะเริ่มต้นไปยัง Flutter
-                    safeSend(events, mapOf(
-                        "status" to receiver.status,
-                        "phoneNumber" to "${receiver.phoneNumber ?: ""}"
-                    ))
+                    receiver.setup(binding.applicationContext)
                 }
 
                 binding.applicationContext.registerReceiver(
                     receiver,
                     IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED)
                 )
+
             }
 
             override fun onCancel(arguments: Any?) {
@@ -61,7 +69,10 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
         })
     }
 
+
     private fun safeSend(events: EventChannel.EventSink?,data:Map<String,Any>){
+        println("send to Flutter :${data}")
+
         if(data["status"] == 0 || data["status"] == 1){
             if("${data["phoneNumber"]}".length > 6) {
                 events?.success(data)
@@ -69,6 +80,8 @@ class FlutterStreamHandle(binding: FlutterPlugin.FlutterPluginBinding) {
         }else {
             events?.success(data)
         }
+
+        methodChannel.invokeMethod("state_change",data)
     }
 
     fun dispose() {

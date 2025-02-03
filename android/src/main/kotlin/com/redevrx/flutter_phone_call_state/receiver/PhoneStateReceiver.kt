@@ -1,125 +1,143 @@
 package com.redevrx.flutter_phone_call_state.receiver
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
-import android.telephony.PhoneStateListener
+import android.util.Log
+import java.lang.reflect.Method
+
+
 
 
 open class PhoneStateReceiver : BroadcastReceiver() {
     var status: Int = -1
     var phoneNumber: String? = null
-    private var isDialing = false
     private var isIncoming = false
-    private var lastDialNumber:String? = null
-    private var isSecondCallIncoming = false // detect two call
 
-    fun instance(context: Context) {
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        telephonyManager.listen(mPhoneListener, PhoneStateListener.LISTEN_CALL_STATE)
-        phoneNumber = null
+    private var lastState: Int = -1
+    private var methodGetState:Method? = null
+    private var objectCallManager:Any? = null
+
+    @SuppressLint("PrivateApi")
+    fun setup(context:Context){
+        val loader = context.classLoader
+        val callManagerClass: Class<*> =
+            loader.loadClass("com.android.internal.telephony.CallManager")
+
+        val getInstanceMethod = callManagerClass.getDeclaredMethod("getInstance")
+
+        objectCallManager = getInstanceMethod.invoke(null)
+        Log.i("TAG", "Object loaded " + objectCallManager?.javaClass?.name)
+
+        methodGetState = objectCallManager?.javaClass?.getDeclaredMethod("getState")
+        Log.i("TAG", "Method loaded " + methodGetState?.name)
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
         try {
-            val incomingNumber = intent?.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
-            val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
+            Log.i("TAG", "Phone state = " + methodGetState?.invoke(objectCallManager))
 
-            extraState.let {
-                println("raw status: $it")
-                when (it) {
-                    TelephonyManager.EXTRA_STATE_RINGING -> {
-                        status = 2
-                        phoneNumber = incomingNumber
-                        isIncoming = true
-                    }
-                    TelephonyManager.EXTRA_STATE_OFFHOOK ->  {
-                        if(isIncoming){
-                            status = 3
-                            isIncoming = false
-                        } else if(isDialing){
-                            if(incomingNumber != null && incomingNumber != lastDialNumber){
-                                status = 4
-                                isDialing = false
-                            }
-                        }else {
-                            status = 1
-                            isDialing = true
-                            lastDialNumber = incomingNumber
+//            val pState = intent?.getIntExtra("foreground_state", -2)
+//            when (pState) {
+//                0 -> println("IDLE")
+//                3 -> println("DIALING")
+//                4 -> println("ALERTING")
+//                1 -> println("ACTIVE")
+//            }
+//            println("foreground_state: $pState")
+
+            //We listen to two intents.  The new outgoing call only tells us of an outgoing call.  We use it to get the number.
+            if(intent?.action.equals("android.intent.action.NEW_OUTGOING_CALL")){
+                phoneNumber = intent?.getStringExtra("android.intent.extra.PHONE_NUMBER")
+            }
+            else {
+                val incomingNumber = intent?.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
+                val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
+
+                extraState?.let {
+                    println("call status: $it number: $incomingNumber")
+
+                    var state = 0
+                    when(it){
+                        "IDLE" -> {
+                            state = TelephonyManager.CALL_STATE_IDLE
+                        }
+                        "OFFHOOK" -> {
+                            state = TelephonyManager.CALL_STATE_OFFHOOK
+                        }
+                        "RINGING" -> {
+                            state = TelephonyManager.CALL_STATE_RINGING
                         }
                     }
-                    TelephonyManager.EXTRA_STATE_IDLE -> {
-                        if(isDialing || isIncoming){
-                            status = 0
-                            phoneNumber = null
-                        }else {
-                            ///nothing
-                            status = -1
-                            phoneNumber = null
-                        }
-                    }
-                    else -> {
-                        status = -1
-                    }
+
+
+                    onCallStateChanged(state, incomingNumber ?: "")
                 }
             }
 
-            phoneNumber = incomingNumber
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private val mPhoneListener = object : PhoneStateListener() {
-        @Deprecated("Deprecated in Java")
-        override fun onCallStateChanged(state: Int, incomingNumber: String?) {
-        checkCallStatus(state,incomingNumber)
+    /**
+     *   case 0:
+     *         return CallState.end;
+     *       case 1:
+     *         return CallState.outgoing;
+     *       case 2:
+     *         return CallState.incoming;
+     *       case 3:
+     *         return CallState.call;
+     *       case 4:
+     *         return CallState.outgoingAccept;
+     *       case 5:
+     *         return CallState.hold;
+     *       case 6:
+     *         return CallState.interruptAndHold;
+     *       default:
+     *         return CallState.none;
+     */
+    private fun onCallStateChanged(state: Int, number: String) {
+        println("onCallStateChanged status: $state number: $number")
+        phoneNumber = number
+
+        if (lastState == state) {
+            return
         }
-    }
 
-    private fun checkCallStatus(state:Int,incomingNumber:String?){
-        try {
-            println("raw status: $state")
+        when (state) {
+            TelephonyManager.CALL_STATE_RINGING -> {
+                isIncoming = true
+                phoneNumber = number
+                status = 2 /// incoming call
+            }
 
-            when (state) {
-                TelephonyManager.CALL_STATE_IDLE -> {
-                    if(isDialing || isIncoming){
-                        status = 0
-                        phoneNumber = null
-                    }else {
-                        ///nothing
-                        status = -1
-                        phoneNumber = null
-                    }
-                }
-                TelephonyManager.CALL_STATE_RINGING -> {
-                    status = 2
-                    phoneNumber = incomingNumber
+            TelephonyManager.CALL_STATE_OFFHOOK ->                 //Transition of ringing->offhook are pickups of incoming calls.  Nothing done on them
+                if (lastState != TelephonyManager.CALL_STATE_RINGING) {
+                    isIncoming = false
+                    status = 1 ///outgoing
+                } else {
                     isIncoming = true
+                    status = 3 /// incoming answer
                 }
-                TelephonyManager.CALL_STATE_OFFHOOK -> {
-                    if(isIncoming){
-                        status = 3
-                        isIncoming = false
-                    } else if(isDialing){
-                       if(incomingNumber != null && incomingNumber != lastDialNumber){
-                           status = 4
-                           isDialing = false
-                       }
-                    }else {
-                        status = 1
-                        isDialing = true
-                        lastDialNumber = incomingNumber
-                    }
+
+            TelephonyManager.CALL_STATE_IDLE ->                 //Went to idle-  this is the end of a call.  What type depends on previous state(s)
+                status = if (lastState == TelephonyManager.CALL_STATE_RINGING) {
+                    //Ring but no pickup-  a miss
+                    -1 //onMissedCall
+                } else if (isIncoming) {
+                    0
+                    /// onIncomingCallEnded
+                } else {
+                    0
+                    ///onOutgoingCallEnded
                 }
-                else -> {
-                    status = -1
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+        lastState = state
     }
 }
 
