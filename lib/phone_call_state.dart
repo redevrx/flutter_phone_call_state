@@ -13,4 +13,7 @@ class PhoneCallState {
   /// get phone call state change
   /// [phoneStateChange]
   Stream<CallResult> get phoneStateChange => _phoneCallState.phoneStateChange();
+
+  void onStateChange({required void Function(CallResult result) callback}) =>
+      _phoneCallState.onStateChange(callback: callback);
 }
