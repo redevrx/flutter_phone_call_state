@@ -1,9 +1,9 @@
 package com.redevrx.flutter_phone_call_state
 
-import CallMonitoringService
 import android.content.Intent
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.redevrx.flutter_phone_call_state.handle.FlutterStreamHandle
+import com.redevrx.flutter_phone_call_state.receiver.CallMonitoringService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
@@ -16,7 +16,7 @@ class FlutterPhoneCallStatePlugin: FlutterPlugin {
 
     runBlocking {
       val context = flutterPluginBinding.applicationContext
-      val intent = Intent(context,CallMonitoringService::class.java)
+      val intent = Intent(context, CallMonitoringService::class.java)
       context.stopService(intent)
       delay(1000)
       context.startService(intent)
