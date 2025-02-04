@@ -122,7 +122,7 @@ object FlutterStreamHandle {
             )
 
             cursor?.let {
-                while (it.moveToFirst()) {
+                if (it.moveToFirst()) {
                     val number = it.getString(it.getColumnIndex(CallLog.Calls.NUMBER))
                     val date = it.getLong(it.getColumnIndex(CallLog.Calls.DATE))
                     val duration = it.getInt(it.getColumnIndex(CallLog.Calls.DURATION))

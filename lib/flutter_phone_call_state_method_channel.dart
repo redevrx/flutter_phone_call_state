@@ -11,7 +11,7 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   final _methodChannel =
       const MethodChannel('flutter_phone_call_state_channel');
   final _methodChannelCallLog =
-  const MethodChannel('flutter_phone_call_state_call_log');
+      const MethodChannel('flutter_phone_call_state_call_log');
 
   @override
   void onStateChange({required void Function(CallResult result) callback}) {
@@ -40,6 +40,9 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   @override
   Future<CallLogData> getLastCall() async {
     final arg = await _methodChannelCallLog.invokeMethod("check_last_call");
-    return CallLogData.fromJson(arg);
+    final json = Map<String, dynamic>.from(
+        arg.map((key, value) => MapEntry(key.toString(), value)));
+
+    return CallLogData.fromJson(json);
   }
 }
