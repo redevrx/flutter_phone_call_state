@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:flutter_phone_call_state/src/model/call_log.dart';
 import 'package:flutter_phone_call_state/src/model/call_result.dart';
 
 import 'flutter_phone_call_state_platform_interface.dart';
@@ -7,7 +8,8 @@ import 'flutter_phone_call_state_platform_interface.dart';
 class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   /// The method channel used to interact with the native platform.
   final _eventChannel = const EventChannel('flutter_phone_call_state');
-  final _methodChannel = const MethodChannel('flutter_phone_call_state_channel');
+  final _methodChannel =
+      const MethodChannel('flutter_phone_call_state_channel');
 
   @override
   void onStateChange({required void Function(CallResult result) callback}) {
@@ -31,5 +33,15 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
         .map((event) => CallResult.fromFlag(event))
         .asBroadcastStream()
         .distinct();
+  }
+
+  @override
+  void getLastCall({required void Function(CallLog log) callback}) {
+    _methodChannel.setMethodCallHandler((call) async {
+      if (call.method == "") {
+        final log = CallLog.fromJson(call.arguments);
+        callback(log);
+      }
+    });
   }
 }

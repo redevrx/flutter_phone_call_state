@@ -1,10 +1,13 @@
 package com.redevrx.flutter_phone_call_state.handle
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.provider.CallLog
 import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
 import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
@@ -29,6 +32,8 @@ object FlutterStreamHandle {
         methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_channel")
 
         mBinding = binding
+
+        initCallMethod()
     }
 
     fun monitorCall(){
@@ -79,8 +84,72 @@ object FlutterStreamHandle {
         })
     }
 
+    private fun initCallMethod(){
+        methodChannel.setMethodCallHandler { call, result ->
+            if(call.method == "check_last_call"){
+                val data = checkLastCall()
+                result.success(data)
+            }
+        }
+    }
 
-    private fun safeSend(events: EventChannel.EventSink?,data:Map<String,Any>){
+    @SuppressLint("Range")
+    private fun checkLastCall(): Map<String, Any> {
+        val context = mBinding.applicationContext
+        val hasCallLogPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_CALL_LOG
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val result = mutableMapOf<String,Any>()
+
+        if(hasCallLogPermission){
+            val resolver: ContentResolver = context.contentResolver
+            val cursor = resolver.query(
+                CallLog.Calls.CONTENT_URI,
+                arrayOf(
+                    CallLog.Calls._ID,
+                    CallLog.Calls.NUMBER,
+                    CallLog.Calls.DATE,
+                    CallLog.Calls.DURATION,
+                    CallLog.Calls.TYPE
+                ),
+                null,
+                null,
+                "${CallLog.Calls.DATE} DESC"
+            )
+
+            cursor?.let {
+                while (it.moveToFirst()) {
+                    val number = it.getString(it.getColumnIndex(CallLog.Calls.NUMBER))
+                    val date = it.getLong(it.getColumnIndex(CallLog.Calls.DATE))
+                    val duration = it.getInt(it.getColumnIndex(CallLog.Calls.DURATION))
+                    val type = it.getInt(it.getColumnIndex(CallLog.Calls.TYPE))
+
+                    val callType = when (type) {
+                        CallLog.Calls.INCOMING_TYPE -> "Incoming"
+                        CallLog.Calls.OUTGOING_TYPE -> "Outgoing"
+                        CallLog.Calls.MISSED_TYPE -> "Missed"
+                        else -> "Unknown"
+                    }
+
+                    result.putAll(mapOf(
+                        "callType" to callType,
+                        "number" to number,
+                        "date" to date,
+                        "duration" to duration,
+                        "isAnswer" to (duration > 0))
+                    )
+                }
+            }
+            cursor?.close()
+        }
+
+        return result
+    }
+
+
+    private fun safeSend(events: EventChannel.EventSink?, data:Map<String,Any>){
         callback?.onStateChange(data)
 
         events?.success(data)

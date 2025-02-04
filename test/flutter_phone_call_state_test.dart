@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_phone_call_state/src/model/call_log.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state_platform_interface.dart';
@@ -17,6 +18,9 @@ class MockFlutterPhoneCallStatePlatform
   @override
   void onStateChange({required void Function(CallResult result) callback}) {
   }
+
+  @override
+  void getLastCall({required void Function(CallLog log) callback}) {}
 }
 
 void main() {
