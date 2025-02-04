@@ -32,8 +32,6 @@ object FlutterStreamHandle {
         methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_channel")
 
         mBinding = binding
-
-        initCallMethod()
     }
 
     fun monitorCall(){
@@ -82,15 +80,6 @@ object FlutterStreamHandle {
                 mBinding.applicationContext.unregisterReceiver(receiver)
             }
         })
-    }
-
-    private fun initCallMethod(){
-        methodChannel.setMethodCallHandler { call, result ->
-            if(call.method == "check_last_call"){
-                val data = checkLastCall()
-                result.success(data)
-            }
-        }
     }
 
     @SuppressLint("Range")
@@ -165,6 +154,11 @@ object FlutterStreamHandle {
             events?.success(data)
 
             methodChannel.invokeMethod("state_change",data)
+        }
+
+        ///send call log
+        if(mStatus == 0){
+            methodChannel.invokeMethod("check_last_call", checkLastCall())
         }
     }
 
