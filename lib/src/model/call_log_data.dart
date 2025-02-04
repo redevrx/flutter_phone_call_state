@@ -1,11 +1,11 @@
-class CallLog {
+class CallLogData {
   final String callType;
   final String number;
   final String date;
   final int duration;
   final bool isAnswer;
 
-  CallLog({
+  CallLogData({
     required this.callType,
     required this.number,
     required this.date,
@@ -13,8 +13,8 @@ class CallLog {
     required this.isAnswer,
   });
 
-  factory CallLog.fromJson(Map<String, dynamic> json) {
-    return CallLog(
+  factory CallLogData.fromJson(Map<String, dynamic> json) {
+    return CallLogData(
       callType: json['callType'] ?? '',
       number: json['number'] ?? '',
       date: '${json['date'] ?? ''}',

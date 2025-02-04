@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:flutter_phone_call_state/src/model/call_log.dart';
+import 'package:flutter_phone_call_state/src/model/call_log_data.dart';
 import 'package:flutter_phone_call_state/src/model/call_result.dart';
 
 import 'flutter_phone_call_state_platform_interface.dart';
@@ -36,8 +36,8 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   }
 
   @override
-  Future<CallLog> getLastCall() async {
+  Future<CallLogData> getLastCall() async {
     final arg = await _methodChannel.invokeMethod("check_last_call");
-    return CallLog.fromJson(arg);
+    return CallLogData.fromJson(arg);
   }
 }

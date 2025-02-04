@@ -1,4 +1,4 @@
-import 'package:flutter_phone_call_state/src/model/call_log.dart';
+import 'package:flutter_phone_call_state/src/model/call_log_data.dart';
 import 'package:flutter_phone_call_state/src/model/call_result.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'flutter_phone_call_state_method_channel.dart';
@@ -27,7 +27,7 @@ abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
 
   void onStateChange({required void Function(CallResult result) callback});
 
-  Future<CallLog> getLastCall();
+  Future<CallLogData> getLastCall();
 
   Stream<CallResult> phoneStateChange() {
     throw UnimplementedError('has not been implemented.');
