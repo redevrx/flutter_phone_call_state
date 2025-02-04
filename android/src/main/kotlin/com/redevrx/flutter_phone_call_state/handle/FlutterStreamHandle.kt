@@ -150,11 +150,22 @@ object FlutterStreamHandle {
 
 
     private fun safeSend(events: EventChannel.EventSink?, data:Map<String,Any>){
-        callback?.onStateChange(data)
+        val mStatus = data["status"]
+        if(mStatus == 0 || mStatus == 1){
+            if("${data["phoneNumber"]}".length > 6){
+                callback?.onStateChange(data)
 
-        events?.success(data)
+                events?.success(data)
 
-        methodChannel.invokeMethod("state_change",data)
+                methodChannel.invokeMethod("state_change",data)
+            }
+        } else {
+            callback?.onStateChange(data)
+
+            events?.success(data)
+
+            methodChannel.invokeMethod("state_change",data)
+        }
     }
 
     fun setCallback(callback: EventCallback){

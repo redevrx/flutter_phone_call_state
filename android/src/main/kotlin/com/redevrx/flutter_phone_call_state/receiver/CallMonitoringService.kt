@@ -55,8 +55,13 @@ class CallMonitoringService :Service(){
         FlutterStreamHandle.monitorCall()
         return  START_STICKY
     }
+
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        stopSelf()
+    }
 }
