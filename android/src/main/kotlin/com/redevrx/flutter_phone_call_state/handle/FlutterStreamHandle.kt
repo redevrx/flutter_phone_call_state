@@ -24,19 +24,21 @@ interface EventCallback {
 object FlutterStreamHandle {
     private lateinit var phoneStateEventChannel: EventChannel
     private lateinit var methodChannel: MethodChannel
+    private lateinit var methodChannelCallLog: MethodChannel
     private var callback:EventCallback? = null
     private lateinit var mBinding: FlutterPlugin.FlutterPluginBinding
 
     fun init(binding: FlutterPlugin.FlutterPluginBinding){
         phoneStateEventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
         methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_channel")
+        methodChannelCallLog = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_call_log")
 
         mBinding = binding
-
-        initCallMethod()
     }
 
     fun monitorCall(){
+        initCallMethod()
+
         phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             private lateinit var receiver: PhoneStateReceiver
 
@@ -87,7 +89,8 @@ object FlutterStreamHandle {
     private fun initCallMethod(){
         methodChannel.setMethodCallHandler { call, result ->
             if(call.method == "check_last_call"){
-                result.success(checkLastCall())
+                val data = checkLastCall()
+                result.success(data)
             }
         }
     }
