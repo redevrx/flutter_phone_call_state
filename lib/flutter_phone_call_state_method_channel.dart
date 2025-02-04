@@ -36,12 +36,8 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   }
 
   @override
-  void getLastCall({required void Function(CallLog log) callback}) {
-    _methodChannel.setMethodCallHandler((call) async {
-      if (call.method == "check_last_call") {
-        final log = CallLog.fromJson(call.arguments);
-        callback(log);
-      }
-    });
+  Future<CallLog> getLastCall() async {
+    final arg = await _methodChannel.invokeMethod("check_last_call");
+    return CallLog.fromJson(arg);
   }
 }

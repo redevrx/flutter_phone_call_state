@@ -27,7 +27,7 @@ abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
 
   void onStateChange({required void Function(CallResult result) callback});
 
-  void getLastCall({required void Function(CallLog log) callback});
+  Future<CallLog> getLastCall();
 
   Stream<CallResult> phoneStateChange() {
     throw UnimplementedError('has not been implemented.');

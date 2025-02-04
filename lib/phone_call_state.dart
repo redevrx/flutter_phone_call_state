@@ -18,6 +18,5 @@ class PhoneCallState {
   void onStateChange({required void Function(CallResult result) callback}) =>
       _phoneCallState.onStateChange(callback: callback);
 
-  void getLastCallLog({required void Function(CallLog log) callback}) =>
-      _phoneCallState.getLastCall(callback: callback);
+  Future<CallLog> getLastCallLog() => _phoneCallState.getLastCall();
 }

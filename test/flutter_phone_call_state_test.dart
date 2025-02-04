@@ -20,7 +20,9 @@ class MockFlutterPhoneCallStatePlatform
   }
 
   @override
-  void getLastCall({required void Function(CallLog log) callback}) {}
+  Future<CallLog> getLastCall() async{
+    return CallLog.fromJson({});
+  }
 }
 
 void main() {
