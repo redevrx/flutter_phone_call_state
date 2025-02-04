@@ -87,7 +87,7 @@ object FlutterStreamHandle {
     }
 
     private fun initCallMethod(){
-        methodChannel.setMethodCallHandler { call, result ->
+        methodChannelCallLog.setMethodCallHandler { call, result ->
             if(call.method == "check_last_call"){
                 val data = checkLastCall()
                 result.success(data)
