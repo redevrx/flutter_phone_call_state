@@ -7,21 +7,31 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
+import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
-import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
+interface EventCallback {
+    fun onStateChange(data: Map<String, Any?>)
+}
+
 object FlutterStreamHandle {
     private lateinit var phoneStateEventChannel: EventChannel
     private lateinit var methodChannel: MethodChannel
+    private var callback:EventCallback? = null
+    private lateinit var mBinding: FlutterPlugin.FlutterPluginBinding
 
     fun init(binding: FlutterPlugin.FlutterPluginBinding){
         phoneStateEventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
         methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_channel")
 
+        mBinding = binding
+    }
+
+    fun monitorCall(){
         phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             private lateinit var receiver: PhoneStateReceiver
 
@@ -41,7 +51,7 @@ object FlutterStreamHandle {
                     }
                 }
 
-                val context = binding.applicationContext
+                val context = mBinding.applicationContext
                 val hasPhoneStatePermission = ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.READ_PHONE_STATE
@@ -53,10 +63,10 @@ object FlutterStreamHandle {
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (hasPhoneStatePermission && hasCallLogPermission) {
-                    receiver.setup(binding.applicationContext)
+                    receiver.setup(mBinding.applicationContext)
                 }
 
-                binding.applicationContext.registerReceiver(
+                mBinding.applicationContext.registerReceiver(
                     receiver,
                     IntentFilter(TelephonyManager.ACTION_PHONE_STATE_CHANGED)
                 )
@@ -64,24 +74,22 @@ object FlutterStreamHandle {
             }
 
             override fun onCancel(arguments: Any?) {
-                binding.applicationContext.unregisterReceiver(receiver)
+                mBinding.applicationContext.unregisterReceiver(receiver)
             }
         })
     }
 
 
     private fun safeSend(events: EventChannel.EventSink?,data:Map<String,Any>){
-        println("send to Flutter :${data}")
+        callback?.onStateChange(data)
 
-        if(data["status"] == 0 || data["status"] == 1){
-            if("${data["phoneNumber"]}".length > 6) {
-                events?.success(data)
-            }
-        }else {
-            events?.success(data)
-        }
+        events?.success(data)
 
         methodChannel.invokeMethod("state_change",data)
+    }
+
+    fun setCallback(callback: EventCallback){
+        this.callback = callback
     }
 
     fun dispose() {

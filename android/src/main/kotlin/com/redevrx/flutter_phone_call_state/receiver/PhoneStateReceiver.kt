@@ -1,14 +1,9 @@
 package com.redevrx.flutter_phone_call_state.receiver
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.TelephonyManager
-import android.util.Log
-import java.lang.reflect.Method
-
-
 
 
 open class PhoneStateReceiver : BroadcastReceiver() {
@@ -17,27 +12,11 @@ open class PhoneStateReceiver : BroadcastReceiver() {
     private var isIncoming = false
 
     private var lastState: Int = -1
-    private var methodGetState:Method? = null
-    private var objectCallManager:Any? = null
 
-    @SuppressLint("PrivateApi")
-    fun setup(context:Context){
-        val loader = context.classLoader
-        val callManagerClass: Class<*> =
-            loader.loadClass("com.android.internal.telephony.CallManager")
-
-        val getInstanceMethod = callManagerClass.getDeclaredMethod("getInstance")
-
-        objectCallManager = getInstanceMethod.invoke(null)
-        Log.i("TAG", "Object loaded " + objectCallManager?.javaClass?.name)
-
-        methodGetState = objectCallManager?.javaClass?.getDeclaredMethod("getState")
-        Log.i("TAG", "Method loaded " + methodGetState?.name)
-    }
+    fun setup(context:Context){}
 
     override fun onReceive(context: Context?, intent: Intent?) {
         try {
-            Log.i("TAG", "Phone state = " + methodGetState?.invoke(objectCallManager))
 
 //            val pState = intent?.getIntExtra("foreground_state", -2)
 //            when (pState) {
@@ -57,7 +36,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                 val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
 
                 extraState?.let {
-                    println("call status: $it number: $incomingNumber")
 
                     var state = 0
                     when(it){
@@ -102,7 +80,6 @@ open class PhoneStateReceiver : BroadcastReceiver() {
      *         return CallState.none;
      */
     private fun onCallStateChanged(state: Int, number: String) {
-        println("onCallStateChanged status: $state number: $number")
         phoneNumber = number
 
         if (lastState == state) {
