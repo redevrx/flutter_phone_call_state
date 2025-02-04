@@ -1,3 +1,4 @@
+import 'package:flutter_phone_call_state/src/model/call_log.dart';
 import 'package:flutter_phone_call_state/src/model/call_result.dart';
 
 import 'flutter_phone_call_state_platform_interface.dart';
@@ -16,4 +17,7 @@ class PhoneCallState {
 
   void onStateChange({required void Function(CallResult result) callback}) =>
       _phoneCallState.onStateChange(callback: callback);
+
+  void getLastCallLog({required void Function(CallLog log) callback}) =>
+      _phoneCallState.getLastCall(callback: callback);
 }
