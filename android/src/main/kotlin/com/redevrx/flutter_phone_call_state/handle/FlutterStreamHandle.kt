@@ -150,7 +150,6 @@ object FlutterStreamHandle {
         return result
     }
 
-
     private fun safeSend(events: EventChannel.EventSink?, data:Map<String,Any>){
         val mStatus = data["status"]
         if(mStatus == 0 || mStatus == 1){
