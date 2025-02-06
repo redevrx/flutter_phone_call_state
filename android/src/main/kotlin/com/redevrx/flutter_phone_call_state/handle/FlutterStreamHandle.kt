@@ -89,7 +89,8 @@ object FlutterStreamHandle {
     private fun initCallMethod(){
         methodChannelCallLog.setMethodCallHandler { call, result ->
             if(call.method == "check_last_call"){
-                val data = checkLastCall()
+                val isAfterLastCall = call.arguments as? Boolean ?: false
+                val data = if(isAfterLastCall) checkAfterLastCall() else checkLastCall()
                 result.success(data)
             }
         }
@@ -142,6 +143,65 @@ object FlutterStreamHandle {
                         "duration" to duration,
                         "isAnswer" to (duration > 0))
                     )
+                }
+            }
+            cursor?.close()
+        }
+
+        return result
+    }
+
+    @SuppressLint("Range")
+    private fun checkAfterLastCall(): Map<String, Any> {
+        val context = mBinding.applicationContext
+        val hasCallLogPermission = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_CALL_LOG
+        ) == PackageManager.PERMISSION_GRANTED
+
+        val result = mutableMapOf<String,Any>()
+
+        if(hasCallLogPermission){
+            val resolver: ContentResolver = context.contentResolver
+            val cursor = resolver.query(
+                CallLog.Calls.CONTENT_URI,
+                arrayOf(
+                    CallLog.Calls._ID,
+                    CallLog.Calls.NUMBER,
+                    CallLog.Calls.DATE,
+                    CallLog.Calls.DURATION,
+                    CallLog.Calls.TYPE
+                ),
+                null,
+                null,
+                "${CallLog.Calls.DATE} DESC"
+            )
+
+            cursor?.let {
+                if (it.moveToFirst()) {
+                    it.moveToNext()
+
+                    if(!it.isAfterLast){
+                        val number = it.getString(it.getColumnIndex(CallLog.Calls.NUMBER))
+                        val date = it.getLong(it.getColumnIndex(CallLog.Calls.DATE))
+                        val duration = it.getInt(it.getColumnIndex(CallLog.Calls.DURATION))
+                        val type = it.getInt(it.getColumnIndex(CallLog.Calls.TYPE))
+
+                        val callType = when (type) {
+                            CallLog.Calls.INCOMING_TYPE -> "Incoming"
+                            CallLog.Calls.OUTGOING_TYPE -> "Outgoing"
+                            CallLog.Calls.MISSED_TYPE -> "Missed"
+                            else -> "Unknown"
+                        }
+
+                        result.putAll(mapOf(
+                            "callType" to callType,
+                            "number" to number,
+                            "date" to date,
+                            "duration" to duration,
+                            "isAnswer" to (duration > 0))
+                        )
+                    }
                 }
             }
             cursor?.close()

@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_phone_call_state/src/model/call_log_data.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state.dart';
 import 'package:flutter_phone_call_state/flutter_phone_call_state_platform_interface.dart';
@@ -20,7 +19,7 @@ class MockFlutterPhoneCallStatePlatform
   }
 
   @override
-  Future<CallLogData> getLastCall() async{
+  Future<CallLogData> getLastCall({bool isAfterLastCall = false}) async{
     return CallLogData.fromJson({});
   }
 }
