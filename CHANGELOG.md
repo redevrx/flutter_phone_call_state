@@ -1,3 +1,8 @@
+## 0.0.7
+- Fix Bug ios
+- Add Android Get Call log (only android)
+- Add Android onStateChange (only android)
+
 ## 0.0.6
  - Fix Bug ios
 

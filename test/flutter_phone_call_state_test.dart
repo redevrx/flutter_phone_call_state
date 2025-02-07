@@ -16,10 +16,11 @@ class MockFlutterPhoneCallStatePlatform
 
   @override
   void onStateChange({required void Function(CallResult result) callback}) {
+    callback(CallResult(state: CallState.call));
   }
 
   @override
-  Future<CallLogData> getLastCall({bool isAfterLastCall = false}) async{
+  Future<CallLogData> getLastCall({bool isAfterLastCall = false}) async {
     return CallLogData.fromJson({});
   }
 }
@@ -160,6 +161,28 @@ void main() {
           },
         );
       });
+
+      test('test phone state callback', () {
+        final flutterPhoneCallStatePlugin = PhoneCallState.instance;
+        final fakePlatform = MockFlutterPhoneCallStatePlatform();
+        FlutterPhoneCallStatePlatform.instance = fakePlatform;
+
+        flutterPhoneCallStatePlugin.onStateChange(callback: (result) {
+          expect(result.state, CallState.call);
+        });
+      });
+
+      // test('test phone call log working only android', () async {
+      //   final flutterPhoneCallStatePlugin = PhoneCallState.instance;
+      //   final fakePlatform =
+      //   MockFlutterPhoneCallStatePlatform();
+      //   FlutterPhoneCallStatePlatform.instance = fakePlatform;
+      //
+      //   final log = await flutterPhoneCallStatePlugin.getLastCallLog();
+      //
+      //   expect(log, isA<CallLogData>());
+      //
+      // });
 
       test('should allow setting a valid instance', () {
         // Arrange: Create a mock instance of FlutterPhoneCallStatePlatform

@@ -11,6 +11,7 @@
 - [How to Use](#how-to-use)
     - [Get Stream Phone Call State](#get-stream-phone-call-state)
     - [Available Call States](#available-call-states)
+    - [Available Android Only](#available-android-only)
 - [Example App](#example-app)
 
 
@@ -56,7 +57,7 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.6
+  flutter_phone_call_state: 0.0.7
 ```
 
 ## Android Permissions
@@ -181,6 +182,13 @@ The `CallState` enum represents various states during a phone call. Each state d
 
 These states help you track the progress of a phone call, allowing you to respond accordingly within your Flutter application.
 
+### Available Android Only:
+
+- **`onStateChange`**:
+  Return call phone state in callback function.
+
+- **`getLastCallLog`**:
+  Return call log from last call or after last call.
 
 ```dart
 

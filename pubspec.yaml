@@ -1,11 +1,11 @@
 name: flutter_phone_call_state
 description: "This Flutter plugin allows you to track and manage phone call states on Android and iOS devices."
-version: 0.0.6
+version: 0.0.7
 homepage: https://www.facebook.com/profile.php?id=100094077041664
 repository: https://github.com/redevrx/flutter_phone_call_state
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.6.2
   flutter: '>=3.3.0'
 
 dependencies:
