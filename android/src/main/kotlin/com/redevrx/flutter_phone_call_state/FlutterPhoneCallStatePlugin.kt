@@ -6,8 +6,10 @@ import androidx.core.content.ContextCompat
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.redevrx.flutter_phone_call_state.handle.FlutterStreamHandle
 import com.redevrx.flutter_phone_call_state.receiver.CallMonitoringService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 /** FlutterPhoneCallStatePlugin */
 class FlutterPhoneCallStatePlugin: FlutterPlugin {
@@ -18,7 +20,7 @@ class FlutterPhoneCallStatePlugin: FlutterPlugin {
     val context = flutterPluginBinding.applicationContext
     val intent = Intent(context, CallMonitoringService::class.java)
 
-    runBlocking {
+    CoroutineScope(Dispatchers.Default).launch {
       delay(2000)
       context.stopService(intent)
       delay(1000)

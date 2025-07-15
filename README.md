@@ -57,7 +57,7 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.8
+  flutter_phone_call_state: 0.0.9
 ```
 
 ## Android Permissions
@@ -65,6 +65,15 @@ dependencies:
 ```xml
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 <uses-permission android:name="android.permission.READ_CALL_LOG" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+<uses-permission android:name="android.permission.MANAGE_OWN_CALLS"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+<service
+android:name="com.redevrx.flutter_phone_call_state.receiver.CallMonitoringService"
+android:exported="false"
+android:foregroundServiceType="phoneCall"/>
 ```
 > **Warning**: Adding `READ_CALL_LOG` permission, your app will be removed from the Play Store if you don't have a valid reason to use it. [Read more](https://support.google.com/googleplay/android-developer/answer/9047303?hl=en). But if you don't add it, you will not be able to know caller's number.
 

@@ -1,3 +1,6 @@
+## 0.0.9
+- Fix Bug Start Service in Android 14
+
 ## 0.0.8
 - Fix Bug Start Service in Android 14
 
