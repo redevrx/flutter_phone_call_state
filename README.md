@@ -57,7 +57,7 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.7
+  flutter_phone_call_state: 0.0.8
 ```
 
 ## Android Permissions
