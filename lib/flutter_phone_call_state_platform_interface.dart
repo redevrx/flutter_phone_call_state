@@ -25,6 +25,9 @@ abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// start monitor service for andro
+  void startMonitorService();
+
   void onStateChange({required void Function(CallResult result) callback});
 
   Future<CallLogData> getLastCall({bool isAfterLastCall = false});

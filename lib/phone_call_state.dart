@@ -15,9 +15,16 @@ class PhoneCallState {
   /// [phoneStateChange]
   Stream<CallResult> get phoneStateChange => _phoneCallState.phoneStateChange();
 
+  /// phoneStateChange
   void onStateChange({required void Function(CallResult result) callback}) =>
       _phoneCallState.onStateChange(callback: callback);
 
+  /// get last call log
   Future<CallLogData> getLastCallLog({bool isAfterLastCall = false}) =>
       _phoneCallState.getLastCall(isAfterLastCall: isAfterLastCall);
+
+  ///working only android
+  ///ios auto start
+  ///[startMonitorService]
+  void startMonitorService() => _phoneCallState.startMonitorService();
 }

@@ -23,6 +23,9 @@ class MockFlutterPhoneCallStatePlatform
   Future<CallLogData> getLastCall({bool isAfterLastCall = false}) async {
     return CallLogData.fromJson({});
   }
+
+  @override
+  void startMonitorService() {}
 }
 
 void main() {
@@ -181,7 +184,6 @@ void main() {
       //   final log = await flutterPhoneCallStatePlugin.getLastCallLog();
       //
       //   expect(log, isA<CallLogData>());
-      //
       // });
 
       test('should allow setting a valid instance', () {
@@ -194,6 +196,7 @@ void main() {
         // Assert: Verify that the setter has correctly set the instance
         expect(FlutterPhoneCallStatePlatform.instance, mockPlatform);
       });
+
     },
   );
 }
