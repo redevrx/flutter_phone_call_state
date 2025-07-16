@@ -12,8 +12,7 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
       const MethodChannel('flutter_phone_call_state_channel');
   final _methodChannelCallLog =
       const MethodChannel('flutter_phone_call_state_call_log');
-  final _methodChannelMonitor =
-  const MethodChannel('phone_call_state_monitor');
+  final _methodChannelMonitor = const MethodChannel('phone_call_state_monitor');
 
   @override
   void onStateChange({required void Function(CallResult result) callback}) {

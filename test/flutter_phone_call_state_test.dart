@@ -196,7 +196,6 @@ void main() {
         // Assert: Verify that the setter has correctly set the instance
         expect(FlutterPhoneCallStatePlatform.instance, mockPlatform);
       });
-
     },
   );
 }

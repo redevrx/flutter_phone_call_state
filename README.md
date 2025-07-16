@@ -57,7 +57,7 @@ This Flutter plugin allows you to track and manage phone call states on Android 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_phone_call_state: 0.0.9
+  flutter_phone_call_state: 0.1.0
 ```
 
 ## Android Permissions
@@ -127,6 +127,20 @@ import ...
 ```
 
 > **Warning** The background task should be called before the app enters background mode or app mini mode, or at the moment when the call is initiated. If called directly in applicationDidEnterBackground, the plugin might not work properly.
+
+## Android Background Monitor Handler
+```dart
+  Future<void> requestPermission() async {
+  final results = await [Permission.notification, Permission.phone].request();
+
+  if (results[Permission.notification]?.isGranted == true &&
+          results[Permission.phone]?.isGranted == true) {
+    if (Platform.isAndroid) {
+      PhoneCallState.instance.startMonitorService();
+    }
+  }
+}
+```
 
 ## HOW TO USE
 
@@ -208,10 +222,22 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    subscriptionPhoneCallStateChange();
+    requestPermission();
   }
 
+  Future<void> requestPermission() async {
+    final results = await [Permission.notification, Permission.phone].request();
 
+    if (results[Permission.notification]?.isGranted == true &&
+            results[Permission.phone]?.isGranted == true) {
+      if (Platform.isAndroid) {
+        PhoneCallState.instance.startMonitorService();
+      }
+    }
+
+    subscriptionPhoneCallStateChange();
+  }
+  
   void subscriptionPhoneCallStateChange() async {
     _phoneCallStatePlugin.phoneStateChange.listen(
       (event) {
