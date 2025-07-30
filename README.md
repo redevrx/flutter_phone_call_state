@@ -232,10 +232,16 @@ class _MyAppState extends State<MyApp> {
             results[Permission.phone]?.isGranted == true) {
       if (Platform.isAndroid) {
         PhoneCallState.instance.startMonitorService();
+
+         ///wait start service.
+        await Future.delayed(const Duration(seconds: 2));
+        subscriptionPhoneCallStateChange();
       }
     }
 
-    subscriptionPhoneCallStateChange();
+    if (Platform.iOS) {
+      subscriptionPhoneCallStateChange();
+     }
   }
   
   void subscriptionPhoneCallStateChange() async {
