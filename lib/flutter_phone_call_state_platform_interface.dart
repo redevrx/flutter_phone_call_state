@@ -26,7 +26,7 @@ abstract class FlutterPhoneCallStatePlatform extends PlatformInterface {
   }
 
   /// start monitor service for andro
-  void startMonitorService();
+  Future<void> startMonitorService();
 
   void onStateChange({required void Function(CallResult result) callback});
 

@@ -26,5 +26,5 @@ class PhoneCallState {
   ///working only android
   ///ios auto start
   ///[startMonitorService]
-  void startMonitorService() => _phoneCallState.startMonitorService();
+  Future<void> startMonitorService() => _phoneCallState.startMonitorService();
 }

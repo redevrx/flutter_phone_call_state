@@ -9,13 +9,17 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.provider.CallLog
 import android.telephony.TelephonyManager
+import android.util.Log
 import androidx.core.content.ContextCompat
 import com.redevrx.flutter_phone_call_state.receiver.PhoneStateReceiver
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 interface EventCallback {
     fun onStateChange(data: Map<String, Any?>)
@@ -27,6 +31,13 @@ object FlutterStreamHandle {
     private lateinit var methodChannelCallLog: MethodChannel
     private var callback:EventCallback? = null
     private lateinit var mBinding: FlutterPlugin.FlutterPluginBinding
+//    private val mainHandler = Handler(Looper.getMainLooper())
+     val scope = CoroutineScope(Dispatchers.Main+ SupervisorJob())
+    private lateinit var receiver: PhoneStateReceiver
+    private var eventSink: EventChannel.EventSink? = null
+    var isResumeApp = true
+    private var openAppCallback:(()-> Unit)? = null
+    private var isEndCall = false
 
     fun init(binding: FlutterPlugin.FlutterPluginBinding){
         phoneStateEventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
@@ -36,28 +47,41 @@ object FlutterStreamHandle {
         mBinding = binding
     }
 
+    fun setOpenAppCallback(callback:()-> Unit){
+        openAppCallback = callback
+    }
+
     fun monitorCall(){
         initCallMethod()
+        receiver = object : PhoneStateReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                super.onReceive(context, intent)
 
-        phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
-            private lateinit var receiver: PhoneStateReceiver
-
-            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-                receiver = object : PhoneStateReceiver() {
-                    override fun onReceive(context: Context?, intent: Intent?) {
-                        super.onReceive(context, intent)
-
-                        runBlocking {
-                            delay(750)
-
-                            safeSend(events, mapOf(
-                                "status" to status,
-                                "phoneNumber" to (phoneNumber ?: "")
-                            ))
-                        }
-                    }
+                val data = mapOf(
+                    "status" to status,
+                    "phoneNumber" to (phoneNumber ?: "")
+                )
+                if(status != 0){
+                    isEndCall = true
                 }
 
+                scope.launch(Dispatchers.Main){
+                    if(!isResumeApp && status == 0 && isEndCall){
+                        openAppCallback?.invoke()
+                        isEndCall = false
+                    }
+
+                    delay(750)
+                    safeSend(eventSink, data)
+                }
+            }
+        }
+
+        if(!::phoneStateEventChannel.isInitialized) return
+        phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
+
+            override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+                eventSink = events
                 val context = mBinding.applicationContext
                 val hasPhoneStatePermission = ContextCompat.checkSelfPermission(
                     context,

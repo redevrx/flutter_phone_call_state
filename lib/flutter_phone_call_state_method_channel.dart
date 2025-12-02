@@ -49,7 +49,7 @@ class MethodChannelFlutterPhoneCallState extends FlutterPhoneCallStatePlatform {
   }
 
   @override
-  void startMonitorService() async {
-    await _methodChannelMonitor.invokeMethod("startCallService");
+  Future<void> startMonitorService()  {
+    return _methodChannelMonitor.invokeMethod("startCallService");
   }
 }

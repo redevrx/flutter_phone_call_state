@@ -1,9 +1,18 @@
 package com.redevrx.flutter_phone_call_state.receiver
 
+import android.app.ActivityManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.telephony.TelephonyManager
+import android.util.Log
+import androidx.core.content.ContextCompat
+import com.redevrx.flutter_phone_call_state.handle.FlutterStreamHandle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 open class PhoneStateReceiver : BroadcastReceiver() {
@@ -17,7 +26,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent?) {
         try {
-
+            
 //            val pState = intent?.getIntExtra("foreground_state", -2)
 //            when (pState) {
 //                0 -> println("IDLE")
@@ -32,6 +41,18 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                 phoneNumber = intent?.getStringExtra("android.intent.extra.PHONE_NUMBER")
             }
             else {
+                if (!CallMonitoringService.isRunning) {
+                    val serviceIntent = Intent(context, CallMonitoringService::class.java)
+                    context?.let { ctx ->
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            ctx.startForegroundService( serviceIntent)
+                        } else {
+                            ctx.startService(serviceIntent)
+                        }
+                    }
+                }
+
+
                 val incomingNumber = intent?.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER)
                 val extraState = intent?.getStringExtra(TelephonyManager.EXTRA_STATE)
 
@@ -93,7 +114,9 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                 status = 2 /// incoming call
             }
 
-            TelephonyManager.CALL_STATE_OFFHOOK ->                 //Transition of ringing->offhook are pickups of incoming calls.  Nothing done on them
+            TelephonyManager.CALL_STATE_OFFHOOK ->
+                //Transition of ringing->offhook are pickups of incoming calls.
+                // Nothing done on them
                 if (lastState != TelephonyManager.CALL_STATE_RINGING) {
                     isIncoming = false
                     status = 1 ///outgoing
@@ -102,7 +125,9 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                     status = 3 /// incoming answer
                 }
 
-            TelephonyManager.CALL_STATE_IDLE ->                 //Went to idle-  this is the end of a call.  What type depends on previous state(s)
+            TelephonyManager.CALL_STATE_IDLE ->
+                //Went to idle-  this is the end of a call.
+                // What type depends on previous state(s)
                 status = if (lastState == TelephonyManager.CALL_STATE_RINGING) {
                     //Ring but no pickup-  a miss
                     -1 //onMissedCall
@@ -116,5 +141,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
         }
         lastState = state
     }
+
+
 }
 

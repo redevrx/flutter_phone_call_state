@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    requestPermission();
+   scheduleMicrotask(requestPermission);
   }
 
   Future<void> requestPermission() async {
@@ -33,11 +33,16 @@ class _MyAppState extends State<MyApp> {
     if (results[Permission.notification]?.isGranted == true &&
         results[Permission.phone]?.isGranted == true) {
       if (Platform.isAndroid) {
-        PhoneCallState.instance.startMonitorService();
+        ///android should start foreground service
+        ///after call phoneStateChange
+        await PhoneCallState.instance.startMonitorService();
+        await Future.delayed(const Duration(seconds: 2));
+        subscriptionPhoneCallStateChange();
+      }else {
+        subscriptionPhoneCallStateChange();
       }
     }
 
-    subscriptionPhoneCallStateChange();
   }
 
   void subscriptionPhoneCallStateChange() async {
