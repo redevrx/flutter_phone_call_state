@@ -24,10 +24,8 @@ void main() {
 
   testWidgets('getPlatformVersion test', (WidgetTester tester) async {
     final plugin = PhoneCallState.instance;
-    plugin.phoneStateChange.listen(
-      (event) {
-        expect(event.number.isEmpty, true);
-      },
-    );
+    plugin.phoneStateChange.listen((event) {
+      expect(event.number.isEmpty, true);
+    });
   });
 }

@@ -10,17 +10,11 @@ class CallResult {
   ///[number]
   final String number;
 
-  CallResult({
-    required this.state,
-    this.number = '',
-  });
+  CallResult({required this.state, this.number = ''});
 
   static CallResult fromFlag(Map data) {
     final flag = data['status'] as int? ?? -1;
-    return CallResult(
-      state: from(flag),
-      number: data['phoneNumber'] ?? '',
-    );
+    return CallResult(state: from(flag), number: data['phoneNumber'] ?? '');
   }
 
   /// Creates a [CallState] from an integer value.

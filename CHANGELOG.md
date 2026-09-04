@@ -1,3 +1,13 @@
+## 0.2.0
+- Migrate to Flutter built-in Kotlin: stop applying `kotlin-android` on AGP 9+
+  (removes the "plugins that apply Kotlin Gradle Plugin" warning). KGP is still
+  applied on AGP 8 so older apps keep building.
+- Android toolchain: AGP 9.1.0, Kotlin 2.4.0, compileSdk 36, Java/jvmTarget 17
+- `android.kotlinOptions` -> top-level `kotlin { compilerOptions { } }`
+- **Breaking**: minSdk 21 -> 24 (Flutter >= 3.44 requires API 24)
+- Requires Flutter >= 3.44.0 / Dart >= 3.12.0
+- No behaviour change: call-state and call-log logic is untouched
+
 ## 0.1.0
 - Android Add startMonitorService
 

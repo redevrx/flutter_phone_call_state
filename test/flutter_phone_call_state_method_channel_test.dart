@@ -12,11 +12,14 @@ void main() {
 
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockStreamHandler(channel, MockStreamHandler.inline(
-      onListen: (arguments, events) {
-        events.success({"status": 0, "phoneNumber": "0857200286"});
-      },
-    ));
+        .setMockStreamHandler(
+          channel,
+          MockStreamHandler.inline(
+            onListen: (arguments, events) {
+              events.success({"status": 0, "phoneNumber": "0857200286"});
+            },
+          ),
+        );
 
     //     .setMockMethodCallHandler(
     //   channel,

@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-   scheduleMicrotask(requestPermission);
+    scheduleMicrotask(requestPermission);
   }
 
   Future<void> requestPermission() async {
@@ -38,54 +38,50 @@ class _MyAppState extends State<MyApp> {
         await PhoneCallState.instance.startMonitorService();
         await Future.delayed(const Duration(seconds: 2));
         subscriptionPhoneCallStateChange();
-      }else {
+      } else {
         subscriptionPhoneCallStateChange();
       }
     }
-
   }
 
   void subscriptionPhoneCallStateChange() async {
-    _phoneCallStatePlugin.phoneStateChange.listen(
-      (event) {
-        switch (event.state) {
-          case CallState.end:
-          // TODO: Handle this case.
-          case CallState.outgoing:
-          // TODO: Handle this case.
-          case CallState.outgoingAccept:
-          // TODO: Handle this case.
-          case CallState.incoming:
-          // TODO: Handle this case.
-          case CallState.call:
-          // TODO: Handle this case.
-          case CallState.none:
-          // TODO: Handle this case.
-          case CallState.hold:
-          // TODO: Handle this case.
-          case CallState.interruptAndHold:
-          // TODO: Handle this case.
-        }
+    _phoneCallStatePlugin.phoneStateChange.listen((event) {
+      switch (event.state) {
+        case CallState.end:
+        // TODO: Handle this case.
+        case CallState.outgoing:
+        // TODO: Handle this case.
+        case CallState.outgoingAccept:
+        // TODO: Handle this case.
+        case CallState.incoming:
+        // TODO: Handle this case.
+        case CallState.call:
+        // TODO: Handle this case.
+        case CallState.none:
+        // TODO: Handle this case.
+        case CallState.hold:
+        // TODO: Handle this case.
+        case CallState.interruptAndHold:
+        // TODO: Handle this case.
+      }
 
-        debugPrint(
-            "Phone Number: ${event.number} <------> Phone Status:${event.state.name}");
+      debugPrint(
+        "Phone Number: ${event.number} <------> Phone Status:${event.state.name}",
+      );
 
-        scheduleMicrotask(() {
-          setState(() {
-            status = '${event.state.name}: ${event.number}';
-          });
+      scheduleMicrotask(() {
+        setState(() {
+          status = '${event.state.name}: ${event.number}';
         });
-      },
-    );
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
+        appBar: AppBar(title: const Text('Plugin example app')),
         body: Column(
           children: [
             InkWell(
@@ -95,9 +91,7 @@ class _MyAppState extends State<MyApp> {
                 await launchUrlString("tel://0824112873");
               },
             ),
-            Center(
-              child: Text('Phone status: $status\n'),
-            ),
+            Center(child: Text('Phone status: $status\n')),
           ],
         ),
       ),
