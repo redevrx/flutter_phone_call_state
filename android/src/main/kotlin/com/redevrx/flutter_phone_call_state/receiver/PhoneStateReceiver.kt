@@ -41,13 +41,31 @@ open class PhoneStateReceiver : BroadcastReceiver() {
                 phoneNumber = intent?.getStringExtra("android.intent.extra.PHONE_NUMBER")
             }
             else {
+                /**
+                 * Restarting the service must never be able to abort the state update below.
+                 *
+                 * Since Android 12 `startForegroundService()` from the background throws
+                 * [android.app.ForegroundServiceStartNotAllowedException] - and a phone-state
+                 * broadcast arriving while the user sits in the dialer is exactly that case.
+                 * The throw used to escape to the `catch` wrapping the whole of `onReceive`,
+                 * so `onCallStateChanged()` at the end of this method never ran: the call was
+                 * over and nothing downstream was ever told. Silent, and only on the calls
+                 * that matter - the ones placed with the app in the background.
+                 *
+                 * Best effort now. Failing to restart the service costs monitoring while
+                 * backgrounded; swallowing the state change costs the call.
+                 */
                 if (!CallMonitoringService.isRunning) {
                     val serviceIntent = Intent(context, CallMonitoringService::class.java)
                     context?.let { ctx ->
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            ctx.startForegroundService( serviceIntent)
-                        } else {
-                            ctx.startService(serviceIntent)
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                ctx.startForegroundService(serviceIntent)
+                            } else {
+                                ctx.startService(serviceIntent)
+                            }
+                        } catch (e: Exception) {
+                            Log.w("PhoneCallState", "could not restart CallMonitoringService", e)
                         }
                     }
                 }
@@ -78,7 +96,7 @@ open class PhoneStateReceiver : BroadcastReceiver() {
 
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.w("PhoneCallState", "onReceive failed", e)
         }
     }
 

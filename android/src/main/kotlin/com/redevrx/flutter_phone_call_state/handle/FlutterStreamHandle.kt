@@ -39,6 +39,29 @@ object FlutterStreamHandle {
     private var openAppCallback:(()-> Unit)? = null
     private var isEndCall = false
 
+    private const val TAG = "PhoneCallState"
+
+    /**
+     * `true` once a Flutter engine has attached and [init] has assigned the channels below.
+     *
+     * Every channel here is `lateinit` and is only ever written by [init], which the plugin
+     * calls from `onAttachedToEngine`. Android, however, can start [CallMonitoringService]
+     * when no engine exists at all: the service returns `START_STICKY`, so after the process
+     * is killed the system recreates it and calls `onStartCommand` with a **null** intent,
+     * long before Flutter is up. Touching a channel at that point throws
+     * `UninitializedPropertyAccessException` on the main thread and kills the freshly started
+     * process — which then gets restarted and crashes again.
+     *
+     * The damage is not limited to this plugin: while the process is in that crash loop the
+     * app's other manifest components (a `PHONE_STATE` receiver, say) never get to run, so a
+     * call that ends right then is lost.
+     */
+    val isAttached: Boolean
+        get() = ::mBinding.isInitialized &&
+                ::methodChannel.isInitialized &&
+                ::methodChannelCallLog.isInitialized &&
+                ::phoneStateEventChannel.isInitialized
+
     fun init(binding: FlutterPlugin.FlutterPluginBinding){
         phoneStateEventChannel = EventChannel(binding.binaryMessenger, "flutter_phone_call_state")
         methodChannel = MethodChannel(binding.binaryMessenger,"flutter_phone_call_state_channel")
@@ -51,7 +74,16 @@ object FlutterStreamHandle {
         openAppCallback = callback
     }
 
-    fun monitorCall(){
+    /**
+     * @return `false` when there is no Flutter engine to deliver events to, so the caller can
+     *   stop instead of leaving a service running that cannot do anything. See [isAttached].
+     */
+    fun monitorCall(): Boolean {
+        if (!isAttached) {
+            Log.w(TAG, "monitorCall() called with no Flutter engine attached - ignoring")
+            return false
+        }
+
         initCallMethod()
         receiver = object : PhoneStateReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -77,7 +109,6 @@ object FlutterStreamHandle {
             }
         }
 
-        if(!::phoneStateEventChannel.isInitialized) return
         phoneStateEventChannel.setStreamHandler(object : EventChannel.StreamHandler {
 
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
@@ -108,6 +139,8 @@ object FlutterStreamHandle {
                 mBinding.applicationContext.unregisterReceiver(receiver)
             }
         })
+
+        return true
     }
 
     private fun initCallMethod(){

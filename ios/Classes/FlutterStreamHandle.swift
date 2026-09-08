@@ -30,14 +30,32 @@ import CallKit
             beginBackgroundTask()
         }
 
+   /// End whatever is still running before asking for a new identifier.
+   ///
+   /// `beginBackgroundMonitoring()` is called from `applicationDidEnterBackground`, so it runs
+   /// on every background transition. Overwriting `backgroundTaskIdentifier` without ending the
+   /// previous one orphans that task: nothing holds its identifier any more, so it can never be
+   /// ended and simply runs to expiry. iOS keeps count, and an app that repeatedly lets
+   /// background tasks expire gets terminated by the watchdog.
    private func beginBackgroundTask() {
+        endBackgroundTask()
+
         self.backgroundTaskIdentifier = UIApplication.shared.beginBackgroundTask(expirationHandler: {
                print("Background task is about to expire!")
                self.endBackgroundTask()
         })
    }
 
+        /// Safe to call at any time, including when no task is running.
+        ///
+        /// This is `public` and reachable from the host's `AppDelegate`
+        /// (`FlutterPhoneCallStatePlugin.shared.endBackgroundTask()`), so it can be called
+        /// before `beginBackgroundTask()` ever ran, or twice in a row. Passing `.invalid` to
+        /// `endBackgroundTask(_:)` is a programmer error as far as UIKit is concerned and
+        /// raises an exception, so the guard is what makes the public API honest.
         func endBackgroundTask() {
+               guard self.backgroundTaskIdentifier != .invalid else { return }
+
                UIApplication.shared.endBackgroundTask(self.backgroundTaskIdentifier)
                self.backgroundTaskIdentifier = .invalid
                print("Background task ended")
